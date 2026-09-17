@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartestoque-v3';
+const CACHE_NAME = 'smartestoque-v4';
 
 const ASSETS = [
   '/index.html',
@@ -52,24 +52,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Arquivos estáticos: cache-first, com atualização em segundo plano.
+  // Arquivos estáticos: network-first (sempre pega a versão mais nova quando
+  // há conexão), caindo para o cache só quando a rede falha. Assim uma
+  // mudança de CSS/JS aparece na hora, sem depender de trocar o nome do
+  // cache a cada deploy.
   event.respondWith(
-    caches.match(request).then((doCache) => {
-      if (doCache) return doCache;
-
-      return fetch(request)
-        .then((daRede) => {
-          const copia = daRede.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copia));
-          return daRede;
-        })
-        .catch(
-          () =>
-            new Response('Sem conexão e este arquivo ainda não foi salvo para uso offline.', {
-              status: 503,
-              headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-            })
-        );
-    })
+    fetch(request)
+      .then((daRede) => {
+        const copia = daRede.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copia));
+        return daRede;
+      })
+      .catch(
+        () =>
+          caches.match(request) ||
+          new Response('Sem conexão e este arquivo ainda não foi salvo para uso offline.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          })
+      )
   );
 });
