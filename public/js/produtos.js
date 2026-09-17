@@ -239,6 +239,7 @@
     campoQuantidade.hidden = false;
     inputQuantidade.required = true;
     inputQuantidade.value = '0';
+    document.getElementById('categoria').required = true;
     controlarValidade.checked = false;
     campoValidade.hidden = true;
     inputValidade.required = false;
@@ -254,6 +255,10 @@
     document.getElementById('btn-salvar-produto').textContent = 'Salvar alterações';
 
     document.getElementById('nome').value = produto.nome;
+    // Nao forca "required" aqui: produtos cadastrados antes desta fase podem
+    // ter categoria em branco, e editar outro campo nao pode ficar bloqueado
+    // por isso.
+    document.getElementById('categoria').required = false;
     document.getElementById('categoria').value = produto.categoria || '';
     document.getElementById('codigo_barras').value = produto.codigo_barras || '';
     document.getElementById('preco_custo').value = produto.preco_custo ?? '';
