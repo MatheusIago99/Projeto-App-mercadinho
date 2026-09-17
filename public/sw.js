@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartestoque-v1';
+const CACHE_NAME = 'smartestoque-v2';
 
 const ASSETS = [
   '/index.html',
@@ -10,6 +10,7 @@ const ASSETS = [
   '/js/produtos.js',
   '/js/vendas.js',
   '/js/pwa.js',
+  '/js/splash.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
