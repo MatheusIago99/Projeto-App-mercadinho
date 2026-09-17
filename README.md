@@ -34,3 +34,21 @@ routes/      rotas da API (produtos, vendas, compras, alertas)
 public/      frontend (HTML, CSS e JavaScript)
 server.js    ponto de entrada da aplicação Express
 ```
+
+## Deploy no Render
+
+O repositório já inclui um `render.yaml`, então o Render detecta a
+configuração automaticamente:
+
+1. Crie uma conta em [render.com](https://render.com) (dá pra entrar direto
+   com o GitHub).
+2. Clique em **New +** → **Blueprint** e selecione este repositório.
+3. Confirme a criação do serviço `smartestoque` (plano Free).
+4. Aguarde o build/deploy terminar; o Render mostra a URL pública
+   (algo como `https://smartestoque.onrender.com`).
+
+**Importante:** no plano gratuito do Render o serviço "dorme" após alguns
+minutos sem uso e o disco não é persistente entre reinicializações — ou
+seja, o banco SQLite pode resetar de tempos em tempos. Para uso contínuo de
+verdade (não apenas para a demonstração do trabalho), o ideal é contratar um
+disco persistente no Render ou trocar o SQLite por um banco hospedado.
