@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartEstoque - Vendas</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Registrar venda</h1>
+      <span>A baixa no estoque é automática</span>
+    </div>
+  </header>
+
+  <main>
+    <div id="mensagens"></div>
+
+    <section class="card">
+      <h2>Itens da venda</h2>
+      <div id="itens-venda"></div>
+      <button type="button" class="btn secundario" id="btn-add-item">+ Adicionar item</button>
+      <div class="total" id="total-venda">Total: R$ 0,00</div>
+      <button type="button" class="btn" id="btn-finalizar">Finalizar venda</button>
+    </section>
+
+    <section class="card">
+      <h2>Últimas vendas</h2>
+      <div id="lista-vendas" class="vazio">Carregando...</div>
+    </section>
+  </main>
+
+  <nav class="rodape">
+    <a href="/index.html"><span class="icone">🏠</span>Início</a>
+    <a href="/produtos.html"><span class="icone">📦</span>Produtos</a>
+    <a href="/vendas.html" class="ativo"><span class="icone">🛒</span>Vendas</a>
+  </nav>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/vendas.js"></script>
+</body>
+</html>

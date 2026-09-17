@@ -1,0 +1,242 @@
+:root {
+  --verde: #2e7d32;
+  --verde-claro: #e8f5e9;
+  --vermelho: #c62828;
+  --amarelo: #ef6c00;
+  --cinza: #616161;
+  --fundo: #f4f6f5;
+  --texto: #212121;
+  --borda: #dfe3e0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  padding-bottom: 72px;
+}
+
+header.topo {
+  background: var(--verde);
+  color: #fff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header.topo h1 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+header.topo span {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.alerta {
+  border-left: 4px solid var(--amarelo);
+}
+
+.alerta.vencido {
+  border-left-color: var(--vermelho);
+}
+
+.alerta.estoque-baixo {
+  border-left-color: var(--vermelho);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--cinza);
+}
+
+.badge.vermelho {
+  background: var(--vermelho);
+}
+
+.badge.amarelo {
+  background: var(--amarelo);
+}
+
+.badge.verde {
+  background: var(--verde);
+}
+
+.lista-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+  gap: 8px;
+}
+
+.lista-item:last-child {
+  border-bottom: none;
+}
+
+.lista-item .info small {
+  color: var(--cinza);
+  display: block;
+}
+
+.acoes button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 6px;
+}
+
+.acoes .excluir {
+  color: var(--vermelho);
+}
+
+.acoes .editar {
+  color: var(--verde);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+form input,
+form select {
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.btn {
+  background: var(--verde);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn.secundario {
+  background: #fff;
+  color: var(--verde);
+  border: 1px solid var(--verde);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.item-venda {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-venda select {
+  flex: 1;
+}
+
+.item-venda input {
+  width: 70px;
+}
+
+.total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: right;
+  margin: 8px 0;
+}
+
+.vazio {
+  color: var(--cinza);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.msg {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.msg.erro {
+  background: #ffebee;
+  color: var(--vermelho);
+}
+
+.msg.sucesso {
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+
+nav.rodape {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--borda);
+  display: flex;
+}
+
+nav.rodape a {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0 8px;
+  text-decoration: none;
+  color: var(--cinza);
+  font-size: 0.75rem;
+}
+
+nav.rodape a.ativo {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+nav.rodape a .icone {
+  display: block;
+  font-size: 1.2rem;
+}

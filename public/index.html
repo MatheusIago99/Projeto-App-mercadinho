@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartEstoque</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>SmartEstoque</h1>
+      <span>Mini Mercado Bom Gosto</span>
+    </div>
+  </header>
+
+  <main>
+    <div id="mensagens"></div>
+
+    <section class="card">
+      <h2>Estoque mínimo</h2>
+      <div id="lista-estoque-baixo" class="vazio">Carregando...</div>
+    </section>
+
+    <section class="card">
+      <h2>Produtos vencidos</h2>
+      <div id="lista-vencidos" class="vazio">Carregando...</div>
+    </section>
+
+    <section class="card">
+      <h2>Próximos da validade (7 dias)</h2>
+      <div id="lista-proximos" class="vazio">Carregando...</div>
+    </section>
+  </main>
+
+  <nav class="rodape">
+    <a href="/index.html" class="ativo"><span class="icone">🏠</span>Início</a>
+    <a href="/produtos.html"><span class="icone">📦</span>Produtos</a>
+    <a href="/vendas.html"><span class="icone">🛒</span>Vendas</a>
+  </nav>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
