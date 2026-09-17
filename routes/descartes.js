@@ -28,9 +28,10 @@ router.get('/', (req, res) => {
 
 // Registra o descarte de um produto (venceu, estragou etc.) e dá baixa no estoque.
 router.post('/', (req, res) => {
-  const { produto_id, quantidade, motivo } = req.body;
+  const { produto_id, motivo } = req.body;
+  const quantidade = Number(req.body.quantidade);
 
-  if (!produto_id || !quantidade || quantidade <= 0) {
+  if (!produto_id || !Number.isFinite(quantidade) || quantidade <= 0) {
     return res.status(400).json({ erro: 'Produto e quantidade (maior que zero) são obrigatórios' });
   }
 

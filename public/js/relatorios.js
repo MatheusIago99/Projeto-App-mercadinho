@@ -53,7 +53,7 @@ function graficoMaisVendidos(produtos) {
       return `
         <div class="barra-ranking">
           <div class="barra-ranking-topo">
-            <span>${p.nome}</span>
+            <span>${escapeHtml(p.nome)}</span>
             <strong>${p.quantidade} un</strong>
           </div>
           <div class="barra-ranking-trilho">
@@ -103,8 +103,8 @@ async function carregarDesperdicio() {
         (d) => `
         <div class="lista-item">
           <div class="info">
-            <strong>${d.produto_nome}</strong>
-            <small>${d.quantidade} un · ${formatarMoeda(d.quantidade * d.preco_unitario)}${d.motivo ? ' · ' + d.motivo : ''} · ${new Date(d.data).toLocaleDateString('pt-BR')}</small>
+            <strong>${escapeHtml(d.produto_nome)}</strong>
+            <small>${d.quantidade} un · ${formatarMoeda(d.quantidade * d.preco_unitario)}${d.motivo ? ' · ' + escapeHtml(d.motivo) : ''} · ${new Date(d.data).toLocaleDateString('pt-BR')}</small>
           </div>
         </div>`
       )
