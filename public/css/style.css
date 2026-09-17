@@ -953,7 +953,7 @@ form select:focus {
   min-width: 0;
 }
 
-.atencao-corpo strong {
+.atencao-corpo > strong {
   display: block;
   font-size: 0.92rem;
   margin-bottom: 2px;
@@ -963,6 +963,21 @@ form select:focus {
   margin: 0;
   font-size: 0.82rem;
   color: var(--cinza);
+}
+
+.atencao-corpo p strong {
+  color: var(--texto);
+  font-weight: 700;
+}
+
+.atencao-separador {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 9px;
+  border-radius: 50%;
+  background: var(--cinza-suave);
+  vertical-align: middle;
 }
 
 .atencao-link {
@@ -1302,5 +1317,147 @@ form select:focus {
   .desempenho-grid {
     grid-template-columns: 1.85fr 1fr;
     align-items: start;
+  }
+
+  /* Dashboard (Início): o conteúdo usa uma largura própria, maior que a
+     das demais páginas, para aproveitar o espaço ao lado da sidebar sem
+     alterar o container "main" compartilhado pelas outras 3 telas. */
+  main.dashboard-main {
+    max-width: 1320px;
+  }
+
+  .dash-cabecalho h2 {
+    font-size: 1.65rem;
+  }
+
+  .dash-cabecalho p {
+    font-size: 0.95rem;
+  }
+
+  .kpi-grid {
+    gap: 16px;
+  }
+
+  .kpi-card {
+    padding: 22px 24px;
+  }
+
+  .kpi-topo {
+    margin-bottom: 14px;
+  }
+
+  .kpi-icone {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .kpi-icone svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .kpi-rotulo {
+    font-size: 0.82rem;
+    padding-top: 7px;
+  }
+
+  .kpi-valor {
+    font-size: 2.15rem;
+    margin-bottom: 5px;
+  }
+
+  .kpi-detalhe {
+    font-size: 0.82rem;
+  }
+
+  .atencao {
+    padding: 8px 6px;
+    gap: 18px;
+  }
+
+  .atencao-icone {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .atencao-icone svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .atencao-corpo > strong {
+    font-size: 1.02rem;
+  }
+
+  .atencao-corpo p {
+    font-size: 0.9rem;
+  }
+
+  .atencao-link {
+    font-size: 0.88rem;
+  }
+
+  .card-cabecalho {
+    margin-bottom: 18px;
+  }
+
+  .card-cabecalho h2 {
+    font-size: 1.15rem;
+  }
+
+  .stat-destaque {
+    font-size: 2.25rem;
+    margin-bottom: 18px;
+  }
+
+  .ranking-linha {
+    padding: 13px 0;
+  }
+
+  .ranking-pos {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+
+  .ranking-nome {
+    font-size: 0.94rem;
+  }
+
+  .ranking-numeros strong {
+    font-size: 0.9rem;
+  }
+
+  .ranking-numeros small {
+    font-size: 0.78rem;
+  }
+
+  .movimentacao-item {
+    padding: 14px 0;
+  }
+
+  .movimentacao-icone {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .movimentacao-icone svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .movimentacao-corpo strong {
+    font-size: 0.94rem;
+  }
+
+  .movimentacao-corpo span {
+    font-size: 0.84rem;
+  }
+
+  .movimentacao-data {
+    font-size: 0.8rem;
   }
 }
