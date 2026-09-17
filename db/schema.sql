@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS produtos (
   quantidade INTEGER NOT NULL DEFAULT 0,
   estoque_minimo INTEGER NOT NULL DEFAULT 0,
   validade TEXT,
-  criado_em TEXT NOT NULL DEFAULT (datetime('now'))
+  criado_em TEXT NOT NULL DEFAULT (datetime('now')),
+  preco_custo REAL,
+  codigo_barras TEXT
 );
 
 CREATE TABLE IF NOT EXISTS vendas (

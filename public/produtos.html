@@ -29,47 +29,181 @@
     </div>
   </header>
 
-  <main>
+  <main class="main-largo">
     <div id="mensagens"></div>
 
-    <section class="card">
-      <h2 id="titulo-form">Novo produto</h2>
-      <form id="form-produto">
-        <input type="hidden" id="produto-id" />
-        <label for="nome">Nome</label>
-        <input type="text" id="nome" required />
-
-        <label for="categoria">Categoria</label>
-        <input type="text" id="categoria" placeholder="Ex: Bebidas, Limpeza..." />
-
-        <label for="preco">Preço (R$)</label>
-        <input type="number" id="preco" step="0.01" min="0" required />
-
-        <label for="quantidade">Quantidade em estoque</label>
-        <input type="number" id="quantidade" min="0" required />
-
-        <label for="estoque_minimo">Estoque mínimo</label>
-        <input type="number" id="estoque_minimo" min="0" required />
-
-        <label for="validade">Validade (opcional)</label>
-        <input type="date" id="validade" />
-
-        <button type="submit" class="btn" id="btn-salvar">Salvar produto</button>
-        <button type="button" class="btn secundario" id="btn-cancelar" style="display:none">Cancelar edição</button>
-      </form>
-    </section>
-
-    <section class="card">
-      <h2>Produtos cadastrados</h2>
-      <div class="filtro-produtos">
-        <input type="search" id="filtro-busca" placeholder="Buscar por nome..." />
-        <select id="filtro-categoria">
-          <option value="">Todas categorias</option>
-        </select>
+    <section class="pagina-cabecalho">
+      <div>
+        <h2>Produtos</h2>
+        <p>Gerencie seu catálogo e acompanhe seu estoque.</p>
       </div>
-      <div id="lista-produtos" class="vazio">Carregando...</div>
+      <button type="button" class="btn" id="btn-novo-produto">+ Novo produto</button>
     </section>
+
+    <div class="toolbar-produtos">
+      <div class="busca-produtos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="filtro-busca" placeholder="Buscar produto ou código de barras..." aria-label="Buscar produto ou código de barras" />
+      </div>
+      <select id="filtro-categoria" aria-label="Filtrar por categoria">
+        <option value="">Todas categorias</option>
+      </select>
+      <select id="filtro-status" aria-label="Filtrar por status">
+        <option value="">Todos os status</option>
+        <option value="normal">Normal</option>
+        <option value="estoque_baixo">Estoque baixo</option>
+        <option value="sem_estoque">Sem estoque</option>
+        <option value="vencendo">Vencendo</option>
+        <option value="vencido">Vencido</option>
+      </select>
+      <select id="filtro-validade" aria-label="Filtrar por validade">
+        <option value="">Toda validade</option>
+        <option value="sem_validade">Sem validade</option>
+        <option value="vencidos">Vencidos</option>
+        <option value="vencendo">Vencem em 7 dias</option>
+        <option value="com_validade">Com validade</option>
+      </select>
+    </div>
+
+    <div id="produtos-container"></div>
   </main>
+
+  <!-- Modal: cadastro / edição de produto -->
+  <dialog id="modal-produto" class="modal" aria-labelledby="modal-produto-titulo">
+    <form id="form-produto">
+      <div class="modal-cabecalho">
+        <h2 id="modal-produto-titulo">Novo produto</h2>
+        <button type="button" class="modal-fechar" id="fechar-modal-produto" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-corpo">
+        <div id="form-produto-erro" class="modal-erro" hidden></div>
+        <input type="hidden" id="produto-id" />
+
+        <fieldset>
+          <legend>Informações básicas</legend>
+          <label for="nome">Nome do produto *</label>
+          <input type="text" id="nome" required />
+
+          <label for="categoria">Categoria *</label>
+          <input type="text" id="categoria" required list="lista-categorias" placeholder="Ex: Bebidas, Limpeza..." />
+          <datalist id="lista-categorias"></datalist>
+
+          <label for="codigo_barras">Código de barras</label>
+          <input type="text" id="codigo_barras" placeholder="Ex: 7894900011517" inputmode="numeric" />
+        </fieldset>
+
+        <fieldset>
+          <legend>Preços</legend>
+          <div class="linha-form">
+            <div>
+              <label for="preco_custo">Preço de custo (R$)</label>
+              <input type="number" id="preco_custo" step="0.01" min="0" />
+            </div>
+            <div>
+              <label for="preco">Preço de venda (R$) *</label>
+              <input type="number" id="preco" step="0.01" min="0" required />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset id="fieldset-estoque">
+          <legend>Estoque</legend>
+          <div class="linha-form">
+            <div id="campo-quantidade">
+              <label for="quantidade">Quantidade inicial *</label>
+              <input type="number" id="quantidade" min="0" required />
+            </div>
+            <div>
+              <label for="estoque_minimo">Estoque mínimo *</label>
+              <input type="number" id="estoque_minimo" min="0" required />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Validade</legend>
+          <label class="switch-linha" for="controlar_validade">
+            <input type="checkbox" id="controlar_validade" />
+            <span>Controlar validade</span>
+          </label>
+          <div id="campo-validade" hidden>
+            <label for="validade">Data de validade</label>
+            <input type="date" id="validade" />
+          </div>
+        </fieldset>
+      </div>
+      <div class="modal-rodape">
+        <button type="button" class="btn secundario" id="btn-cancelar-produto">Cancelar</button>
+        <button type="submit" class="btn" id="btn-salvar-produto">Cadastrar produto</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal: reposição de estoque -->
+  <dialog id="modal-reposicao" class="modal modal-pequeno" aria-labelledby="modal-reposicao-titulo">
+    <div class="modal-cabecalho">
+      <h2 id="modal-reposicao-titulo">Repor estoque</h2>
+      <button type="button" class="modal-fechar" id="fechar-modal-reposicao" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-corpo">
+      <div id="reposicao-erro" class="modal-erro" hidden></div>
+      <p id="reposicao-produto-nome" style="font-weight:700;margin:0;"></p>
+      <div class="resumo-linha">
+        <span>Estoque atual</span>
+        <strong id="reposicao-estoque-atual">0</strong>
+      </div>
+      <div>
+        <label for="reposicao-quantidade">Quantidade para adicionar</label>
+        <input type="number" id="reposicao-quantidade" min="1" value="1" />
+      </div>
+      <div class="resumo-linha destaque">
+        <span>Novo estoque</span>
+        <strong id="reposicao-novo-estoque">0</strong>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn secundario" id="btn-cancelar-reposicao">Cancelar</button>
+      <button type="button" class="btn" id="btn-confirmar-reposicao">Confirmar reposição</button>
+    </div>
+  </dialog>
+
+  <!-- Modal: registrar descarte -->
+  <dialog id="modal-descarte" class="modal modal-pequeno" aria-labelledby="modal-descarte-titulo">
+    <div class="modal-cabecalho">
+      <h2 id="modal-descarte-titulo">Registrar descarte</h2>
+      <button type="button" class="modal-fechar" id="fechar-modal-descarte" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-corpo">
+      <div id="descarte-erro" class="modal-erro" hidden></div>
+      <p id="descarte-produto-nome" style="font-weight:700;margin:0;"></p>
+      <div class="resumo-linha">
+        <span>Estoque atual</span>
+        <strong id="descarte-estoque-atual">0</strong>
+      </div>
+      <div>
+        <label for="descarte-quantidade">Quantidade a descartar</label>
+        <input type="number" id="descarte-quantidade" min="1" value="1" />
+      </div>
+      <div>
+        <label for="descarte-motivo">Motivo (opcional)</label>
+        <input type="text" id="descarte-motivo" placeholder="Ex: Venceu, avariado..." />
+      </div>
+      <div class="resumo-linha destaque" id="resumo-descarte-novo-estoque">
+        <span>Estoque após descarte</span>
+        <strong id="descarte-novo-estoque">0</strong>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn secundario" id="btn-cancelar-descarte">Cancelar</button>
+      <button type="button" class="btn" id="btn-confirmar-descarte">Confirmar descarte</button>
+    </div>
+  </dialog>
 
   <script src="/js/layout.js"></script>
   <script src="/js/api.js"></script>
