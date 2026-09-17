@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS produtos (
 CREATE TABLE IF NOT EXISTS vendas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   data TEXT NOT NULL DEFAULT (datetime('now')),
-  total REAL NOT NULL DEFAULT 0
+  total REAL NOT NULL DEFAULT 0,
+  forma_pagamento TEXT,
+  valor_recebido REAL
 );
 
 CREATE TABLE IF NOT EXISTS venda_itens (
