@@ -29,11 +29,12 @@ router.post('/', (req, res) => {
     'INSERT INTO venda_itens (venda_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)'
   );
 
-  const registrarVenda = db.transaction((itensVenda) => {
+  db.exec('BEGIN');
+  try {
     let total = 0;
     const detalhes = [];
 
-    for (const item of itensVenda) {
+    for (const item of itens) {
       const produto = buscarProduto.get(item.produto_id);
       if (!produto) throw new Error(`Produto ${item.produto_id} não encontrado`);
       if (produto.quantidade < item.quantidade) {
@@ -51,14 +52,11 @@ router.post('/', (req, res) => {
       atualizarEstoque.run(produto.quantidade - quantidade, produto.id);
     }
 
-    return vendaId;
-  });
-
-  try {
-    const vendaId = registrarVenda(itens);
-    const venda = db.prepare('SELECT * FROM vendas WHERE id = ?').get(vendaId);
-    res.status(201).json(venda);
+    db.exec('COMMIT');
+    const vendaCriada = db.prepare('SELECT * FROM vendas WHERE id = ?').get(vendaId);
+    res.status(201).json(vendaCriada);
   } catch (err) {
+    db.exec('ROLLBACK');
     res.status(400).json({ erro: err.message });
   }
 });
