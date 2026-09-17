@@ -59,14 +59,17 @@ router.get('/', (req, res) => {
 
   if (resultado.length < LIMITE_EVENTOS) {
     const produtos = db.prepare('SELECT nome, quantidade, estoque_minimo, validade FROM produtos').all();
+
+    // Mesma comparacao de datas usada em routes/alertas.js, para os dois
+    // widgets do dashboard nunca discordarem sobre o mesmo produto.
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const limite = new Date();
+    limite.setDate(hoje.getDate() + DIAS_ALERTA_VALIDADE);
 
     const baixos = produtos.filter((p) => p.quantidade <= p.estoque_minimo);
     const vencendo = produtos.filter((p) => {
       if (!p.validade) return false;
-      const dias = Math.round((new Date(p.validade + 'T00:00:00') - hoje) / 86400000);
-      return dias >= 0 && dias <= DIAS_ALERTA_VALIDADE;
+      return new Date(p.validade) >= hoje && new Date(p.validade) <= limite;
     });
 
     const extras = [];
