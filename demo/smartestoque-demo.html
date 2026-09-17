@@ -1,0 +1,910 @@
+<title>SmartEstoque</title>
+<meta name="description" content="Demonstração do SmartEstoque, app de estoque e vendas do Mini Mercado Bom Gosto." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #eef2ec;
+    --surface: #ffffff;
+    --surface-alt: #e7ede4;
+    --ink: #1b241d;
+    --muted: #5c6b60;
+    --border: #d7e0d3;
+    --accent: #2f6f4f;
+    --accent-ink: #ffffff;
+    --accent-soft: #e1efe4;
+    --warn: #a9700a;
+    --warn-bg: #faedd6;
+    --warn-border: #ecd6a4;
+    --critical: #ab3a2c;
+    --critical-bg: #fbe6e1;
+    --critical-border: #edc2b7;
+    --shadow: 0 1px 2px rgba(20, 30, 20, 0.06), 0 8px 24px rgba(20, 30, 20, 0.08);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11150f;
+      --surface: #1a2118;
+      --surface-alt: #212a1e;
+      --ink: #eaf0e6;
+      --muted: #9caf9e;
+      --border: #2c3728;
+      --accent: #62b789;
+      --accent-ink: #0c1710;
+      --accent-soft: #203327;
+      --warn: #e3ac52;
+      --warn-bg: #3a2c14;
+      --warn-border: #57431f;
+      --critical: #e58472;
+      --critical-bg: #3a1f1a;
+      --critical-border: #59332a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #11150f;
+    --surface: #1a2118;
+    --surface-alt: #212a1e;
+    --ink: #eaf0e6;
+    --muted: #9caf9e;
+    --border: #2c3728;
+    --accent: #62b789;
+    --accent-ink: #0c1710;
+    --accent-soft: #203327;
+    --warn: #e3ac52;
+    --warn-bg: #3a2c14;
+    --warn-border: #57431f;
+    --critical: #e58472;
+    --critical-bg: #3a1f1a;
+    --critical-border: #59332a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Work Sans", system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+    padding: 24px 16px;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: min(780px, calc(100vh - 48px));
+  }
+
+  header.topo {
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 20px 20px 16px;
+    flex: 0 0 auto;
+  }
+
+  header.topo .marca {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  header.topo h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+
+  header.topo .loja {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    opacity: 0.88;
+  }
+
+  header.topo .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.16);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  header.topo .status-pill .ponto {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #bdf0d2;
+  }
+
+  main {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .aba { display: none; flex-direction: column; gap: 12px; }
+  .aba.ativa { display: flex; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+
+  .card h2 {
+    font-family: "Fraunces", serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .contagem {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--surface-alt);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .vazio {
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 14px 4px;
+  }
+
+  .aviso-fonte {
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--surface-alt);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 8px 10px;
+    line-height: 1.4;
+  }
+
+  .item-alerta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    margin-bottom: 6px;
+  }
+
+  .item-alerta.critico {
+    background: var(--critical-bg);
+    border-color: var(--critical-border);
+  }
+
+  .item-alerta:last-child { margin-bottom: 0; }
+
+  .item-alerta .nome { font-weight: 600; font-size: 0.88rem; }
+  .item-alerta .detalhe {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 1px;
+  }
+
+  .tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 3px 7px;
+    border-radius: 6px;
+    color: #fff;
+    background: var(--warn);
+    white-space: nowrap;
+  }
+
+  .tag.critico { background: var(--critical); }
+
+  .produto-linha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .produto-linha:last-child { border-bottom: none; }
+
+  .produto-info { flex: 1; min-width: 0; }
+  .produto-info .nome { font-weight: 600; font-size: 0.9rem; }
+  .produto-info .meta {
+    font-size: 0.74rem;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  .barra-estoque {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .barra-estoque > span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+  .barra-estoque.baixo > span { background: var(--critical); }
+
+  .acoes-produto {
+    display: flex;
+    gap: 4px;
+    flex: 0 0 auto;
+  }
+
+  .icone-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icone-btn:hover { background: var(--surface-alt); }
+
+  form { display: flex; flex-direction: column; gap: 8px; }
+
+  .linha-form { display: flex; gap: 8px; }
+  .linha-form > div { flex: 1; min-width: 0; }
+
+  label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 8px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-family: inherit;
+  }
+
+  input:focus, select:focus, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .btn.secundario {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-full { width: 100%; }
+
+  .item-venda {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+  }
+  .item-venda .campo-produto { flex: 1; min-width: 0; }
+  .item-venda .campo-qtd { width: 62px; }
+
+  .total-venda {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px dashed var(--border);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .total-venda .valor { font-size: 1.15rem; font-weight: 600; }
+
+  .venda-linha {
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .venda-linha:last-child { border-bottom: none; }
+  .venda-linha .itens { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .venda-linha .valor { font-family: "JetBrains Mono", monospace; font-weight: 600; white-space: nowrap; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 96px;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 20;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.mostrar { opacity: 1; }
+
+  nav.rodape {
+    flex: 0 0 auto;
+    display: flex;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  nav.rodape button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px 0 calc(9px + env(safe-area-inset-bottom, 0px));
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+  }
+
+  nav.rodape button .ic { display: block; font-size: 1.15rem; margin-bottom: 2px; }
+  nav.rodape button.ativo { color: var(--accent); font-weight: 700; }
+
+  @media (max-width: 400px) {
+    body { padding: 0; }
+    .phone { border-radius: 0; min-height: 100vh; border: none; }
+  }
+</style>
+
+<div class="phone">
+  <header class="topo">
+    <div class="marca">
+      <h1>SmartEstoque</h1>
+    </div>
+    <p class="loja">Mini Mercado Bom Gosto · Caxias do Sul/RS</p>
+    <span class="status-pill"><span class="ponto"></span><span id="status-texto">conectando…</span></span>
+  </header>
+
+  <main>
+    <section class="aba ativa" id="aba-inicio">
+      <div class="card">
+        <h2>Estoque mínimo <span class="contagem" id="contagem-baixo">0</span></h2>
+        <div id="lista-baixo"><div class="vazio">Carregando…</div></div>
+      </div>
+      <div class="card">
+        <h2>Vencidos <span class="contagem" id="contagem-vencidos">0</span></h2>
+        <div id="lista-vencidos"><div class="vazio">Carregando…</div></div>
+      </div>
+      <div class="card">
+        <h2>Vencem em 7 dias <span class="contagem" id="contagem-proximos">0</span></h2>
+        <div id="lista-proximos"><div class="vazio">Carregando…</div></div>
+      </div>
+      <p class="aviso-fonte" id="aviso-exemplo" hidden>
+        Estoque inicial com produtos de exemplo do Mini Mercado Bom Gosto — edite ou exclua em "Produtos" à vontade.
+      </p>
+    </section>
+
+    <section class="aba" id="aba-produtos">
+      <div class="card">
+        <h2 id="titulo-form-produto">Novo produto</h2>
+        <form id="form-produto">
+          <input type="hidden" id="produto-id" />
+          <div>
+            <label for="p-nome">Nome</label>
+            <input id="p-nome" required />
+          </div>
+          <div class="linha-form">
+            <div>
+              <label for="p-categoria">Categoria</label>
+              <input id="p-categoria" placeholder="Mercearia" />
+            </div>
+            <div>
+              <label for="p-preco">Preço (R$)</label>
+              <input id="p-preco" type="number" min="0" step="0.01" required />
+            </div>
+          </div>
+          <div class="linha-form">
+            <div>
+              <label for="p-quantidade">Quantidade</label>
+              <input id="p-quantidade" type="number" min="0" required />
+            </div>
+            <div>
+              <label for="p-minimo">Estoque mínimo</label>
+              <input id="p-minimo" type="number" min="0" required />
+            </div>
+          </div>
+          <div>
+            <label for="p-validade">Validade (opcional)</label>
+            <input id="p-validade" type="date" />
+          </div>
+          <button type="submit" class="btn btn-full" id="btn-salvar-produto">Salvar produto</button>
+          <button type="button" class="btn secundario btn-full" id="btn-cancelar-produto" style="display:none">Cancelar edição</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Produtos cadastrados <span class="contagem" id="contagem-produtos">0</span></h2>
+        <div id="lista-produtos"><div class="vazio">Carregando…</div></div>
+      </div>
+    </section>
+
+    <section class="aba" id="aba-vendas">
+      <div class="card">
+        <h2>Registrar venda</h2>
+        <div id="itens-venda"></div>
+        <button type="button" class="btn secundario btn-full" id="btn-add-item" style="margin-top:8px">+ Adicionar item</button>
+        <div class="total-venda">
+          <span>Total</span>
+          <span class="valor" id="total-venda">R$ 0,00</span>
+        </div>
+        <button type="button" class="btn btn-full" id="btn-finalizar" style="margin-top:10px">Finalizar venda</button>
+      </div>
+      <div class="card">
+        <h2>Últimas vendas</h2>
+        <div id="lista-vendas"><div class="vazio">Carregando…</div></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="rodape">
+    <button class="ativo" data-aba="inicio"><span class="ic">🏠</span>Início</button>
+    <button data-aba="produtos"><span class="ic">📦</span>Produtos</button>
+    <button data-aba="vendas"><span class="ic">🛒</span>Vendas</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const DIAS_ALERTA = 7;
+  const SEED = [
+    { nome: "Arroz 5kg", categoria: "Mercearia", preco: 25.9, quantidade: 14, estoqueMinimo: 5, validade: diasAPartirDeHoje(210) },
+    { nome: "Feijão Carioca 1kg", categoria: "Mercearia", preco: 8.5, quantidade: 3, estoqueMinimo: 6, validade: diasAPartirDeHoje(180) },
+    { nome: "Leite Integral 1L", categoria: "Laticínios", preco: 5.2, quantidade: 18, estoqueMinimo: 8, validade: diasAPartirDeHoje(4) },
+    { nome: "Refrigerante 2L", categoria: "Bebidas", preco: 9.9, quantidade: 22, estoqueMinimo: 6, validade: diasAPartirDeHoje(160) },
+    { nome: "Óleo de Soja 900ml", categoria: "Mercearia", preco: 7.8, quantidade: 2, estoqueMinimo: 5, validade: diasAPartirDeHoje(240) },
+    { nome: "Pão de Forma", categoria: "Padaria", preco: 8.9, quantidade: 6, estoqueMinimo: 4, validade: diasAPartirDeHoje(-1) },
+    { nome: "Detergente 500ml", categoria: "Limpeza", preco: 2.6, quantidade: 20, estoqueMinimo: 8, validade: null },
+    { nome: "Macarrão 500g", categoria: "Mercearia", preco: 4.3, quantidade: 15, estoqueMinimo: 6, validade: diasAPartirDeHoje(300) },
+    { nome: "Açúcar 1kg", categoria: "Mercearia", preco: 5.6, quantidade: 5, estoqueMinimo: 5, validade: diasAPartirDeHoje(250) },
+  ];
+
+  function diasAPartirDeHoje(n) {
+    const d = new Date();
+    d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function formatarMoeda(v) {
+    return (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function formatarData(iso) {
+    if (!iso) return null;
+    const [a, m, d] = iso.split("-");
+    return `${d}/${m}/${a}`;
+  }
+
+  function el(html) {
+    const t = document.createElement("template");
+    t.innerHTML = html.trim();
+    return t.content.firstElementChild;
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("mostrar");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("mostrar"), 2400);
+  }
+
+  // ---------- navegação ----------
+  document.querySelectorAll("nav.rodape button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("nav.rodape button").forEach((b) => b.classList.remove("ativo"));
+      document.querySelectorAll(".aba").forEach((a) => a.classList.remove("ativa"));
+      btn.classList.add("ativo");
+      document.getElementById("aba-" + btn.dataset.aba).classList.add("ativa");
+    });
+  });
+
+  // ---------- estado ----------
+  let db = null;
+  let readOnly = false;
+  let produtos = []; // {id, ...dados}
+  let vendas = [];
+
+  function estoqueBaixo(p) { return p.quantidade <= p.estoqueMinimo; }
+  function diasParaValidade(iso) {
+    if (!iso) return null;
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const alvo = new Date(iso + "T00:00:00");
+    return Math.round((alvo - hoje) / 86400000);
+  }
+
+  function renderAlertas() {
+    const baixo = produtos.filter(estoqueBaixo);
+    const vencidos = produtos.filter((p) => p.validade && diasParaValidade(p.validade) < 0);
+    const proximos = produtos.filter((p) => {
+      if (!p.validade) return false;
+      const dias = diasParaValidade(p.validade);
+      return dias >= 0 && dias <= DIAS_ALERTA;
+    });
+
+    document.getElementById("contagem-baixo").textContent = baixo.length;
+    document.getElementById("contagem-vencidos").textContent = vencidos.length;
+    document.getElementById("contagem-proximos").textContent = proximos.length;
+
+    preencherAlertas("lista-baixo", baixo, (p) => `Qtd: ${p.quantidade} · mínimo: ${p.estoqueMinimo}`, "Nenhum produto com estoque baixo.", true);
+    preencherAlertas("lista-vencidos", vencidos, (p) => `Venceu em ${formatarData(p.validade)}`, "Nenhum produto vencido.", true);
+    preencherAlertas("lista-proximos", proximos, (p) => `Vence em ${formatarData(p.validade)} (${diasParaValidade(p.validade)}d)`, "Nenhum produto perto da validade.", false);
+  }
+
+  function preencherAlertas(id, lista, detalheFn, msgVazia, critico) {
+    const container = document.getElementById(id);
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="vazio">${msgVazia}</div>`;
+      return;
+    }
+    container.innerHTML = "";
+    lista.forEach((p) => {
+      container.appendChild(el(`
+        <div class="item-alerta ${critico ? "critico" : ""}">
+          <div>
+            <span class="nome">${escapeHtml(p.nome)}</span>
+            <span class="detalhe">${detalheFn(p)}</span>
+          </div>
+          <span class="tag ${critico ? "critico" : ""}">${critico ? "atenção" : "em breve"}</span>
+        </div>`));
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function renderProdutos() {
+    document.getElementById("contagem-produtos").textContent = produtos.length;
+    const container = document.getElementById("lista-produtos");
+    if (produtos.length === 0) {
+      container.innerHTML = `<div class="vazio">Nenhum produto cadastrado.</div>`;
+    } else {
+      container.innerHTML = "";
+      produtos.slice().sort((a, b) => a.nome.localeCompare(b.nome)).forEach((p) => {
+        const baixo = estoqueBaixo(p);
+        const pct = p.estoqueMinimo > 0 ? Math.min(100, (p.quantidade / (p.estoqueMinimo * 2)) * 100) : 100;
+        const linha = el(`
+          <div class="produto-linha">
+            <div class="produto-info">
+              <div class="nome">${escapeHtml(p.nome)}</div>
+              <div class="meta">${escapeHtml(p.categoria || "Sem categoria")} · ${formatarMoeda(p.preco)} · ${p.quantidade} un${p.validade ? " · val " + formatarData(p.validade) : ""}</div>
+              <div class="barra-estoque ${baixo ? "baixo" : ""}"><span style="width:${pct}%"></span></div>
+            </div>
+            <div class="acoes-produto">
+              <button class="icone-btn" data-acao="editar" title="Editar">✏️</button>
+              <button class="icone-btn" data-acao="repor" title="Repor estoque">➕</button>
+              <button class="icone-btn" data-acao="excluir" title="Excluir">🗑️</button>
+            </div>
+          </div>`);
+        linha.querySelector('[data-acao="editar"]').addEventListener("click", () => editarProduto(p));
+        linha.querySelector('[data-acao="repor"]').addEventListener("click", () => reporEstoque(p));
+        linha.querySelector('[data-acao="excluir"]').addEventListener("click", () => excluirProduto(p));
+        container.appendChild(linha);
+      });
+    }
+    atualizarSelectsVenda();
+  }
+
+  function renderVendas() {
+    const container = document.getElementById("lista-vendas");
+    if (vendas.length === 0) {
+      container.innerHTML = `<div class="vazio">Nenhuma venda registrada ainda.</div>`;
+      return;
+    }
+    container.innerHTML = "";
+    vendas.forEach((v) => {
+      const itensTexto = (v.itens || []).map((i) => `${i.quantidade}x ${i.nome}`).join(", ");
+      const data = v.data ? new Date(v.data).toLocaleString("pt-BR") : "";
+      container.appendChild(el(`
+        <div class="venda-linha">
+          <div>
+            <div>${data}</div>
+            <div class="itens">${escapeHtml(itensTexto)}</div>
+          </div>
+          <div class="valor">${formatarMoeda(v.total)}</div>
+        </div>`));
+    });
+  }
+
+  // ---------- formulário de produto ----------
+  const formProduto = document.getElementById("form-produto");
+  const btnCancelarProduto = document.getElementById("btn-cancelar-produto");
+  const tituloFormProduto = document.getElementById("titulo-form-produto");
+
+  function limparFormProduto() {
+    formProduto.reset();
+    document.getElementById("produto-id").value = "";
+    tituloFormProduto.textContent = "Novo produto";
+    btnCancelarProduto.style.display = "none";
+  }
+
+  function editarProduto(p) {
+    document.getElementById("produto-id").value = p.id;
+    document.getElementById("p-nome").value = p.nome;
+    document.getElementById("p-categoria").value = p.categoria || "";
+    document.getElementById("p-preco").value = p.preco;
+    document.getElementById("p-quantidade").value = p.quantidade;
+    document.getElementById("p-minimo").value = p.estoqueMinimo;
+    document.getElementById("p-validade").value = p.validade || "";
+    tituloFormProduto.textContent = `Editando: ${p.nome}`;
+    btnCancelarProduto.style.display = "block";
+    document.querySelector('nav.rodape button[data-aba="produtos"]').click();
+  }
+
+  btnCancelarProduto.addEventListener("click", limparFormProduto);
+
+  formProduto.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (readOnly) return toast("Modo somente leitura nesta visualização.");
+
+    const id = document.getElementById("produto-id").value;
+    const dados = {
+      nome: document.getElementById("p-nome").value.trim(),
+      categoria: document.getElementById("p-categoria").value.trim(),
+      preco: Number(document.getElementById("p-preco").value),
+      quantidade: Number(document.getElementById("p-quantidade").value),
+      estoqueMinimo: Number(document.getElementById("p-minimo").value),
+      validade: document.getElementById("p-validade").value || null,
+    };
+
+    try {
+      if (id) {
+        await db.collection("produtos").doc(id).update(dados);
+        toast("Produto atualizado.");
+      } else {
+        dados.criadoEm = Date.now();
+        await db.collection("produtos").add(dados);
+        toast("Produto cadastrado.");
+      }
+      limparFormProduto();
+    } catch (err) {
+      toast("Não foi possível salvar: " + (err && err.message ? err.message : "erro"));
+    }
+  });
+
+  async function excluirProduto(p) {
+    if (readOnly) return toast("Modo somente leitura nesta visualização.");
+    if (!confirm(`Excluir "${p.nome}"?`)) return;
+    try {
+      await db.collection("produtos").doc(p.id).delete();
+      toast("Produto excluído.");
+    } catch (err) {
+      toast("Não foi possível excluir.");
+    }
+  }
+
+  async function reporEstoque(p) {
+    if (readOnly) return toast("Modo somente leitura nesta visualização.");
+    const valor = prompt(`Adicionar quantos "${p.nome}" ao estoque?`, "10");
+    const qtd = Number(valor);
+    if (!valor || Number.isNaN(qtd) || qtd <= 0) return;
+    try {
+      await db.collection("produtos").doc(p.id).update({ quantidade: p.quantidade + qtd });
+      toast("Estoque reposto.");
+    } catch (err) {
+      toast("Não foi possível repor o estoque.");
+    }
+  }
+
+  // ---------- venda ----------
+  const itensVendaEl = document.getElementById("itens-venda");
+
+  function opcoesProdutos() {
+    return produtos
+      .slice()
+      .sort((a, b) => a.nome.localeCompare(b.nome))
+      .map((p) => `<option value="${p.id}">${escapeHtml(p.nome)} (${p.quantidade} em estoque)</option>`)
+      .join("");
+  }
+
+  function atualizarSelectsVenda() {
+    itensVendaEl.querySelectorAll(".campo-produto select").forEach((sel) => {
+      const atual = sel.value;
+      sel.innerHTML = opcoesProdutos();
+      if (atual) sel.value = atual;
+    });
+    atualizarTotalVenda();
+  }
+
+  function novaLinhaVenda() {
+    if (produtos.length === 0) return toast("Cadastre um produto antes de vender.");
+    const linha = el(`
+      <div class="item-venda">
+        <div class="campo-produto">
+          <label>Produto</label>
+          <select>${opcoesProdutos()}</select>
+        </div>
+        <div class="campo-qtd">
+          <label>Qtd</label>
+          <input type="number" min="1" value="1" />
+        </div>
+        <button type="button" class="icone-btn" title="Remover">✕</button>
+      </div>`);
+    linha.querySelector("select").addEventListener("change", atualizarTotalVenda);
+    linha.querySelector("input").addEventListener("input", atualizarTotalVenda);
+    linha.querySelector("button").addEventListener("click", () => { linha.remove(); atualizarTotalVenda(); });
+    itensVendaEl.appendChild(linha);
+    atualizarTotalVenda();
+  }
+
+  function atualizarTotalVenda() {
+    let total = 0;
+    itensVendaEl.querySelectorAll(".item-venda").forEach((linha) => {
+      const id = linha.querySelector("select").value;
+      const qtd = Number(linha.querySelector("input").value) || 0;
+      const produto = produtos.find((p) => p.id === id);
+      if (produto) total += produto.preco * qtd;
+    });
+    document.getElementById("total-venda").textContent = formatarMoeda(total);
+  }
+
+  document.getElementById("btn-add-item").addEventListener("click", novaLinhaVenda);
+
+  document.getElementById("btn-finalizar").addEventListener("click", async () => {
+    if (readOnly) return toast("Modo somente leitura nesta visualização.");
+
+    const linhas = Array.from(itensVendaEl.querySelectorAll(".item-venda"));
+    if (linhas.length === 0) return toast("Adicione ao menos um item.");
+
+    const itens = linhas.map((linha) => ({
+      produtoId: linha.querySelector("select").value,
+      quantidade: Number(linha.querySelector("input").value),
+    }));
+
+    for (const item of itens) {
+      const produto = produtos.find((p) => p.id === item.produtoId);
+      if (!produto || produto.quantidade < item.quantidade) {
+        return toast(`Estoque insuficiente para "${produto ? produto.nome : item.produtoId}".`);
+      }
+    }
+
+    try {
+      let total = 0;
+      const itensDetalhados = [];
+      for (const item of itens) {
+        const produto = produtos.find((p) => p.id === item.produtoId);
+        total += produto.preco * item.quantidade;
+        itensDetalhados.push({ produtoId: produto.id, nome: produto.nome, quantidade: item.quantidade, precoUnitario: produto.preco });
+        await db.collection("produtos").doc(produto.id).update({ quantidade: produto.quantidade - item.quantidade });
+      }
+      await db.collection("vendas").add({ itens: itensDetalhados, total, data: Date.now() });
+      itensVendaEl.innerHTML = "";
+      atualizarTotalVenda();
+      toast("Venda registrada!");
+    } catch (err) {
+      toast("Não foi possível concluir a venda.");
+    }
+  });
+
+  // ---------- inicialização / dados ----------
+  async function semear() {
+    const snap = await db.collection("produtos").limit(1).get();
+    if (!snap.empty) return;
+    document.getElementById("aviso-exemplo").hidden = false;
+    for (const produto of SEED) {
+      await db.collection("produtos").add({ ...produto, criadoEm: Date.now() });
+    }
+  }
+
+  function docsParaLista(snap) {
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  async function iniciarComBanco() {
+    document.getElementById("status-texto").textContent = "sincronizado";
+    await semear().catch(() => {});
+
+    db.collection("produtos").onSnapshot(
+      (snap) => { produtos = docsParaLista(snap); renderAlertas(); renderProdutos(); },
+      () => toast("Conexão com os dados perdida.")
+    );
+
+    db.collection("vendas").orderBy("data", "desc").limit(20).onSnapshot(
+      (snap) => { vendas = docsParaLista(snap); renderVendas(); },
+      () => {}
+    );
+  }
+
+  function iniciarSemBanco() {
+    readOnly = true;
+    document.getElementById("status-texto").textContent = "somente visualização";
+    document.getElementById("aviso-exemplo").hidden = false;
+    produtos = SEED.map((p, i) => ({ id: "demo-" + i, ...p }));
+    vendas = [];
+    renderAlertas();
+    renderProdutos();
+    renderVendas();
+    document.getElementById("btn-finalizar").disabled = true;
+    document.getElementById("btn-add-item").disabled = true;
+  }
+
+  (async function start() {
+    try {
+      db = window.claude ? await window.claude.use("db") : null;
+    } catch (e) {
+      db = null;
+    }
+    if (db) {
+      iniciarComBanco();
+    } else {
+      iniciarSemBanco();
+    }
+  })();
+})();
+</script>
