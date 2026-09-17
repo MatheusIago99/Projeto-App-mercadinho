@@ -11,4 +11,25 @@ db.exec('PRAGMA foreign_keys = ON');
 const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
 db.exec(schema);
 
+// Migrations aditivas e idempotentes: cobrem bancos ja existentes criados
+// antes destas colunas existirem em schema.sql. Nunca remove/renomeia
+// coluna, nunca define valor para linhas existentes (ficam NULL).
+function colunaExiste(tabela, coluna) {
+  return db
+    .prepare(`PRAGMA table_info(${tabela})`)
+    .all()
+    .some((c) => c.name === coluna);
+}
+
+function migrar() {
+  if (!colunaExiste('produtos', 'preco_custo')) {
+    db.exec('ALTER TABLE produtos ADD COLUMN preco_custo REAL');
+  }
+  if (!colunaExiste('produtos', 'codigo_barras')) {
+    db.exec('ALTER TABLE produtos ADD COLUMN codigo_barras TEXT');
+  }
+}
+
+migrar();
+
 module.exports = db;

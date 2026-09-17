@@ -129,3 +129,39 @@ function graficoFaturamento(porDia) {
       ${barras}
     </svg>`;
 }
+
+// Status do produto (para a listagem de Produtos): usa a MESMA
+// interpretação de datas de validade já consolidada em routes/alertas.js
+// (vencido = validade < hoje; vencendo = validade entre hoje e +7 dias),
+// só que combinada com a prioridade visual pedida para a tabela.
+const DIAS_ALERTA_VALIDADE = 7;
+
+const STATUS_ROTULOS = {
+  normal: 'Normal',
+  estoque_baixo: 'Estoque baixo',
+  sem_estoque: 'Sem estoque',
+  vencendo: 'Vencendo',
+  vencido: 'Vencido',
+};
+
+const STATUS_CORES = {
+  normal: 'verde',
+  estoque_baixo: 'amarelo',
+  sem_estoque: 'vermelho',
+  vencendo: 'amarelo',
+  vencido: 'vermelho',
+};
+
+function calcularStatusProduto(produto) {
+  const hoje = new Date();
+  const limite = new Date();
+  limite.setDate(hoje.getDate() + DIAS_ALERTA_VALIDADE);
+
+  const dataValidade = produto.validade ? new Date(produto.validade) : null;
+
+  if (dataValidade && dataValidade < hoje) return 'vencido';
+  if (dataValidade && dataValidade >= hoje && dataValidade <= limite) return 'vencendo';
+  if (produto.quantidade === 0) return 'sem_estoque';
+  if (produto.quantidade <= produto.estoque_minimo) return 'estoque_baixo';
+  return 'normal';
+}
