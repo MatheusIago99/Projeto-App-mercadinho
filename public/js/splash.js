@@ -5,9 +5,22 @@
   const abertoComoApp =
     window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-  if (!abertoComoApp) {
+  let jaMostrouNestaSessao = false;
+  try {
+    jaMostrouNestaSessao = sessionStorage.getItem('smartestoque-splash-mostrada') === '1';
+  } catch (e) {
+    // sessionStorage indisponível (ex: navegação privada): trata como se ainda não tivesse mostrado.
+  }
+
+  if (!abertoComoApp || jaMostrouNestaSessao) {
     splash.remove();
     return;
+  }
+
+  try {
+    sessionStorage.setItem('smartestoque-splash-mostrada', '1');
+  } catch (e) {
+    // sem sessionStorage, a splash pode repetir entre navegações; sem problema.
   }
 
   setTimeout(() => {
