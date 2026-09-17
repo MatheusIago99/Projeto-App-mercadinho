@@ -37,19 +37,37 @@
   <main>
     <div id="mensagens"></div>
 
-    <section class="card">
-      <h2>Estoque mínimo</h2>
-      <div id="lista-estoque-baixo" class="vazio">Carregando...</div>
+    <section class="dash-cabecalho">
+      <h2>Olá, Administrador!</h2>
+      <p>Aqui está o resumo do seu mercadinho hoje.</p>
+    </section>
+
+    <section class="kpi-grid" id="kpi-grid" aria-label="Indicadores do dia"></section>
+
+    <section id="atencao-necessaria"></section>
+
+    <section class="desempenho-grid">
+      <div class="card">
+        <div class="card-cabecalho">
+          <h2>Vendas dos últimos 7 dias</h2>
+        </div>
+        <div class="stat-destaque" id="stat-faturamento-7d"></div>
+        <div id="grafico-vendas-7d"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-cabecalho">
+          <h2>Produtos mais vendidos</h2>
+        </div>
+        <div id="ranking-mais-vendidos"></div>
+      </div>
     </section>
 
     <section class="card">
-      <h2>Produtos vencidos</h2>
-      <div id="lista-vencidos" class="vazio">Carregando...</div>
-    </section>
-
-    <section class="card">
-      <h2>Próximos da validade (7 dias)</h2>
-      <div id="lista-proximos" class="vazio">Carregando...</div>
+      <div class="card-cabecalho">
+        <h2>Movimentações recentes</h2>
+      </div>
+      <div id="lista-movimentacoes"></div>
     </section>
   </main>
 
