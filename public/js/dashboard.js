@@ -126,16 +126,16 @@
     }
 
     const linhas = [];
-    if (estoqueBaixo.length > 0) linhas.push(`${estoqueBaixo.length} produto${estoqueBaixo.length > 1 ? 's' : ''} com estoque baixo`);
-    if (vencidos.length > 0) linhas.push(`${vencidos.length} produto${vencidos.length > 1 ? 's' : ''} vencido${vencidos.length > 1 ? 's' : ''}`);
-    if (proximosDaValidade.length > 0) linhas.push(`${proximosDaValidade.length} vence${proximosDaValidade.length > 1 ? 'm' : ''} nos próximos 7 dias`);
+    if (estoqueBaixo.length > 0) linhas.push(`<strong>${estoqueBaixo.length}</strong> produto${estoqueBaixo.length > 1 ? 's' : ''} com estoque baixo`);
+    if (vencidos.length > 0) linhas.push(`<strong>${vencidos.length}</strong> produto${vencidos.length > 1 ? 's' : ''} vencido${vencidos.length > 1 ? 's' : ''}`);
+    if (proximosDaValidade.length > 0) linhas.push(`<strong>${proximosDaValidade.length}</strong> vence${proximosDaValidade.length > 1 ? 'm' : ''} nos próximos 7 dias`);
 
     container.innerHTML = `
       <div class="card atencao">
         <span class="atencao-icone" aria-hidden="true">${ICONES.alerta}</span>
         <div class="atencao-corpo">
           <strong>Atenção necessária</strong>
-          <p>${linhas.join(' · ')}</p>
+          <p>${linhas.join('<span class="atencao-separador" aria-hidden="true"></span>')}</p>
         </div>
         <a href="/produtos.html" class="atencao-link">Ver detalhes <span aria-hidden="true">${ICONES.seta}</span></a>
       </div>`;
