@@ -14,8 +14,8 @@ Atividades Extensionistas do curso de Análise e Desenvolvimento de Sistemas
 ## Tecnologias
 
 - Frontend: HTML5, CSS e JavaScript
-- Backend: Node.js e Express
-- Banco de dados: SQLite (via `better-sqlite3`)
+- Backend: Node.js (>= 22.5) e Express
+- Banco de dados: SQLite (via o módulo nativo `node:sqlite`, sem dependências compiladas)
 
 ## Como executar
 
