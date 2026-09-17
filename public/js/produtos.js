@@ -2,6 +2,10 @@ const form = document.getElementById('form-produto');
 const btnCancelar = document.getElementById('btn-cancelar');
 const tituloForm = document.getElementById('titulo-form');
 const mensagens = document.getElementById('mensagens');
+const filtroBusca = document.getElementById('filtro-busca');
+const filtroCategoria = document.getElementById('filtro-categoria');
+
+let todosProdutos = [];
 
 function mostrarMensagem(texto, tipo) {
   mensagens.innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
@@ -15,13 +19,41 @@ function limparFormulario() {
   btnCancelar.style.display = 'none';
 }
 
-async function carregarProdutos() {
-  const produtos = await api.listarProdutos();
+function atualizarOpcoesCategoria(produtos) {
+  const categorias = [...new Set(produtos.map((p) => p.categoria).filter(Boolean))].sort();
+  const selecionada = filtroCategoria.value;
+
+  filtroCategoria.innerHTML =
+    '<option value="">Todas categorias</option>' +
+    categorias.map((c) => `<option value="${c}">${c}</option>`).join('');
+
+  if (categorias.includes(selecionada)) filtroCategoria.value = selecionada;
+}
+
+function produtosFiltrados() {
+  const busca = filtroBusca.value.trim().toLowerCase();
+  const categoria = filtroCategoria.value;
+
+  return todosProdutos.filter((p) => {
+    const bateBusca = !busca || p.nome.toLowerCase().includes(busca);
+    const bateCategoria = !categoria || p.categoria === categoria;
+    return bateBusca && bateCategoria;
+  });
+}
+
+function renderizarProdutos() {
   const container = document.getElementById('lista-produtos');
+  const produtos = produtosFiltrados();
+
+  if (todosProdutos.length === 0) {
+    container.className = 'vazio';
+    container.textContent = 'Nenhum produto cadastrado.';
+    return;
+  }
 
   if (produtos.length === 0) {
     container.className = 'vazio';
-    container.textContent = 'Nenhum produto cadastrado.';
+    container.textContent = 'Nenhum produto encontrado com esse filtro.';
     return;
   }
 
@@ -40,6 +72,7 @@ async function carregarProdutos() {
         <div class="acoes">
           <button class="editar" data-id="${p.id}" title="Editar">✏️</button>
           <button class="repor" data-id="${p.id}" title="Repor estoque">➕</button>
+          <button class="descartar" data-id="${p.id}" title="Registrar descarte/perda">♻️</button>
           <button class="excluir" data-id="${p.id}" title="Excluir">🗑️</button>
         </div>
       </div>`;
@@ -47,7 +80,7 @@ async function carregarProdutos() {
     .join('');
 
   container.querySelectorAll('.editar').forEach((btn) => {
-    btn.addEventListener('click', () => editarProduto(btn.dataset.id, produtos));
+    btn.addEventListener('click', () => editarProduto(btn.dataset.id, todosProdutos));
   });
   container.querySelectorAll('.excluir').forEach((btn) => {
     btn.addEventListener('click', () => excluirProduto(btn.dataset.id));
@@ -55,7 +88,42 @@ async function carregarProdutos() {
   container.querySelectorAll('.repor').forEach((btn) => {
     btn.addEventListener('click', () => reporEstoque(btn.dataset.id));
   });
+  container.querySelectorAll('.descartar').forEach((btn) => {
+    btn.addEventListener('click', () => descartarProduto(btn.dataset.id, todosProdutos));
+  });
 }
+
+async function carregarProdutos() {
+  todosProdutos = await api.listarProdutos();
+  atualizarOpcoesCategoria(todosProdutos);
+  renderizarProdutos();
+}
+
+async function descartarProduto(id, produtos) {
+  const produto = produtos.find((p) => String(p.id) === String(id));
+  if (!produto) return;
+
+  const quantidade = prompt(`Quantos "${produto.nome}" foram perdidos/descartados?`, '1');
+  const valor = Number(quantidade);
+  if (!quantidade || Number.isNaN(valor) || valor <= 0) return;
+  if (valor > produto.quantidade) {
+    mostrarMensagem('Quantidade maior que o estoque disponível.', 'erro');
+    return;
+  }
+
+  const motivo = prompt('Motivo (opcional): venceu, avariado, etc.', 'Venceu') || null;
+
+  try {
+    await api.registrarDescarte(id, valor, motivo);
+    mostrarMensagem('Descarte registrado.', 'sucesso');
+    carregarProdutos();
+  } catch (err) {
+    mostrarMensagem(err.message, 'erro');
+  }
+}
+
+filtroBusca.addEventListener('input', renderizarProdutos);
+filtroCategoria.addEventListener('change', renderizarProdutos);
 
 function editarProduto(id, produtos) {
   const produto = produtos.find((p) => String(p.id) === String(id));

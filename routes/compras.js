@@ -5,9 +5,10 @@ const router = express.Router();
 
 // Registra uma compra/reposição, somando ao estoque atual do produto.
 router.post('/', (req, res) => {
-  const { produto_id, quantidade } = req.body;
+  const { produto_id } = req.body;
+  const quantidade = Number(req.body.quantidade);
 
-  if (!produto_id || !quantidade || quantidade <= 0) {
+  if (!produto_id || !Number.isFinite(quantidade) || quantidade <= 0) {
     return res.status(400).json({ erro: 'Produto e quantidade (maior que zero) são obrigatórios' });
   }
 

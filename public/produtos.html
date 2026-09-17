@@ -62,6 +62,12 @@
 
     <section class="card">
       <h2>Produtos cadastrados</h2>
+      <div class="filtro-produtos">
+        <input type="search" id="filtro-busca" placeholder="Buscar por nome..." />
+        <select id="filtro-categoria">
+          <option value="">Todas categorias</option>
+        </select>
+      </div>
       <div id="lista-produtos" class="vazio">Carregando...</div>
     </section>
   </main>
@@ -70,6 +76,7 @@
     <a href="/index.html"><span class="icone">🏠</span>Início</a>
     <a href="/produtos.html" class="ativo"><span class="icone">📦</span>Produtos</a>
     <a href="/vendas.html"><span class="icone">🛒</span>Vendas</a>
+    <a href="/relatorios.html"><span class="icone">📊</span>Relatórios</a>
   </nav>
 
   <script src="/js/api.js"></script>

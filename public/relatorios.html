@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmartEstoque - Vendas</title>
+  <title>SmartEstoque - Relatórios</title>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#2e7d32" />
   <link rel="icon" href="/icons/icon-192.png" />
@@ -21,10 +21,10 @@
 <body>
   <header class="topo">
     <div class="marca">
-      <span class="logo-icone" aria-hidden="true">🛒</span>
+      <span class="logo-icone" aria-hidden="true">📊</span>
       <div>
-        <h1>Registrar venda</h1>
-        <span>A baixa no estoque é automática</span>
+        <h1>Relatórios</h1>
+        <span>Vendas e desperdício dos últimos 14 dias</span>
       </div>
     </div>
     <button type="button" id="btn-instalar" hidden>Instalar app</button>
@@ -34,28 +34,32 @@
     <div id="mensagens"></div>
 
     <section class="card">
-      <h2>Itens da venda</h2>
-      <div id="itens-venda"></div>
-      <button type="button" class="btn secundario" id="btn-add-item">+ Adicionar item</button>
-      <div class="total" id="total-venda">Total: R$ 0,00</div>
-      <button type="button" class="btn" id="btn-finalizar">Finalizar venda</button>
+      <h2>Faturamento</h2>
+      <div class="stat-destaque" id="stat-faturamento">R$ 0,00</div>
+      <div id="grafico-faturamento" class="vazio">Carregando...</div>
     </section>
 
     <section class="card">
-      <h2>Últimas vendas</h2>
-      <div id="lista-vendas" class="vazio">Carregando...</div>
+      <h2>Produtos mais vendidos</h2>
+      <div id="grafico-mais-vendidos" class="vazio">Carregando...</div>
+    </section>
+
+    <section class="card">
+      <h2>Desperdício</h2>
+      <div class="resumo-desperdicio" id="resumo-desperdicio"></div>
+      <div id="lista-descartes" class="vazio">Carregando...</div>
     </section>
   </main>
 
   <nav class="rodape">
     <a href="/index.html"><span class="icone">🏠</span>Início</a>
     <a href="/produtos.html"><span class="icone">📦</span>Produtos</a>
-    <a href="/vendas.html" class="ativo"><span class="icone">🛒</span>Vendas</a>
-    <a href="/relatorios.html"><span class="icone">📊</span>Relatórios</a>
+    <a href="/vendas.html"><span class="icone">🛒</span>Vendas</a>
+    <a href="/relatorios.html" class="ativo"><span class="icone">📊</span>Relatórios</a>
   </nav>
 
   <script src="/js/api.js"></script>
-  <script src="/js/vendas.js"></script>
+  <script src="/js/relatorios.js"></script>
   <script src="/js/pwa.js"></script>
 </body>
 </html>

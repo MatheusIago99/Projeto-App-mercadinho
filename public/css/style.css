@@ -260,6 +260,10 @@ main {
   color: var(--dourado);
 }
 
+.acoes .descartar {
+  color: var(--amarelo);
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -422,10 +426,11 @@ nav.rodape a {
   padding: 8px 0 6px;
   text-decoration: none;
   color: var(--cinza-suave);
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 600;
   border-radius: 14px;
   transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
 }
 
 nav.rodape a.ativo {
@@ -514,4 +519,140 @@ nav.rodape a .icone {
   .vazio {
     animation: none;
   }
+}
+
+/* Relatórios */
+
+.stat-destaque {
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--verde-escura);
+  margin-bottom: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stat-destaque {
+    color: var(--verde);
+  }
+}
+
+.grafico-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.grafico-linha-base {
+  stroke: var(--borda);
+  stroke-width: 1;
+}
+
+.grafico-eixo {
+  font-size: 6px;
+  fill: var(--cinza-suave);
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+.barra-ranking {
+  margin-bottom: 12px;
+}
+
+.barra-ranking:last-child {
+  margin-bottom: 0;
+}
+
+.barra-ranking-topo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  gap: 8px;
+}
+
+.barra-ranking-topo span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.barra-ranking-topo strong {
+  flex: 0 0 auto;
+  color: var(--verde-escura);
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .barra-ranking-topo strong {
+    color: var(--verde);
+  }
+}
+
+.barra-ranking-trilho {
+  background: var(--superficie-alt);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.barra-ranking-trilho span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--verde) 0%, var(--dourado) 160%);
+  border-radius: 999px;
+}
+
+.resumo-desperdicio {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mini-stat {
+  flex: 1;
+  background: var(--superficie-alt);
+  border-radius: var(--raio-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mini-stat strong {
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.mini-stat span {
+  font-size: 0.72rem;
+  color: var(--cinza);
+}
+
+.mini-stat.critico {
+  background: var(--vermelho-clara);
+}
+
+.mini-stat.critico strong {
+  color: var(--vermelho);
+}
+
+/* Filtro de produtos */
+
+.filtro-produtos {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.filtro-produtos input {
+  flex: 1;
+}
+
+.filtro-produtos select {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 130px;
 }
