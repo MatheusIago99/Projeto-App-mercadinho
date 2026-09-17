@@ -22,3 +22,12 @@ CREATE TABLE IF NOT EXISTS venda_itens (
   quantidade INTEGER NOT NULL,
   preco_unitario REAL NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS descartes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  produto_id INTEGER NOT NULL REFERENCES produtos(id),
+  quantidade INTEGER NOT NULL,
+  preco_unitario REAL NOT NULL,
+  motivo TEXT,
+  data TEXT NOT NULL DEFAULT (datetime('now'))
+);

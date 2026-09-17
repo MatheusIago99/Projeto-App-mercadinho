@@ -1,14 +1,16 @@
-const CACHE_NAME = 'smartestoque-v2';
+const CACHE_NAME = 'smartestoque-v3';
 
 const ASSETS = [
   '/index.html',
   '/produtos.html',
   '/vendas.html',
+  '/relatorios.html',
   '/css/style.css',
   '/js/api.js',
   '/js/dashboard.js',
   '/js/produtos.js',
   '/js/vendas.js',
+  '/js/relatorios.js',
   '/js/pwa.js',
   '/js/splash.js',
   '/manifest.json',

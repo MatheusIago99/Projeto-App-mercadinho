@@ -48,6 +48,24 @@ const api = {
     const res = await fetch('/api/alertas');
     return res.json();
   },
+  async relatorioVendas(dias) {
+    const res = await fetch(`/api/relatorios/vendas${dias ? `?dias=${dias}` : ''}`);
+    return res.json();
+  },
+  async listarDescartes() {
+    const res = await fetch('/api/descartes');
+    return res.json();
+  },
+  async registrarDescarte(produto_id, quantidade, motivo) {
+    const res = await fetch('/api/descartes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ produto_id, quantidade, motivo }),
+    });
+    const dados = await res.json();
+    if (!res.ok) throw new Error(dados.erro || 'Erro ao registrar descarte');
+    return dados;
+  },
 };
 
 function formatarMoeda(valor) {
