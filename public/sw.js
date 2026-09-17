@@ -51,15 +51,22 @@ self.addEventListener('fetch', (event) => {
 
   // Arquivos estáticos: cache-first, com atualização em segundo plano.
   event.respondWith(
-    caches.match(request).then((resposta) => {
-      const buscaRede = fetch(request)
-        .then((resposta) => {
-          const copia = resposta.clone();
+    caches.match(request).then((doCache) => {
+      if (doCache) return doCache;
+
+      return fetch(request)
+        .then((daRede) => {
+          const copia = daRede.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copia));
-          return resposta;
+          return daRede;
         })
-        .catch(() => resposta);
-      return resposta || buscaRede;
+        .catch(
+          () =>
+            new Response('Sem conexão e este arquivo ainda não foi salvo para uso offline.', {
+              status: 503,
+              headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            })
+        );
     })
   );
 });

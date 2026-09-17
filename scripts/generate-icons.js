@@ -22,7 +22,7 @@ function cartIcon({ background, radius, scale, offset }) {
   </svg>`;
 }
 
-const GREEN = '#2f6f4f';
+const GREEN = '#2e7d32'; // mesmo verde de --verde em public/css/style.css
 
 const variants = [
   // "any" icons: rounded square background
