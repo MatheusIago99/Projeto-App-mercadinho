@@ -8,6 +8,7 @@ const comprasRouter = require('./routes/compras');
 const alertasRouter = require('./routes/alertas');
 const descartesRouter = require('./routes/descartes');
 const relatoriosRouter = require('./routes/relatorios');
+const movimentacoesRouter = require('./routes/movimentacoes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use('/api/compras', comprasRouter);
 app.use('/api/alertas', alertasRouter);
 app.use('/api/descartes', descartesRouter);
 app.use('/api/relatorios', relatoriosRouter);
+app.use('/api/movimentacoes', movimentacoesRouter);
 
 app.listen(PORT, () => {
   console.log(`SmartEstoque rodando em http://localhost:${PORT}`);
