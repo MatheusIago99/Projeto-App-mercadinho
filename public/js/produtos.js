@@ -33,9 +33,12 @@
   const modalReposicao = document.getElementById('modal-reposicao');
   const modalDescarte = document.getElementById('modal-descarte');
 
+  let timeoutMensagem = null;
+
   function mostrarMensagem(texto, tipo) {
+    clearTimeout(timeoutMensagem);
     mensagens.innerHTML = `<div class="msg ${tipo}">${escapeHtml(texto)}</div>`;
-    setTimeout(() => (mensagens.innerHTML = ''), 3000);
+    timeoutMensagem = setTimeout(() => (mensagens.innerHTML = ''), 3000);
   }
 
   // ---------- carregamento e filtros ----------
