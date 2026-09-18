@@ -689,6 +689,7 @@ form select:focus {
 .grafico-svg {
   width: 100%;
   height: auto;
+  max-height: 220px;
   display: block;
   overflow: visible;
 }
@@ -1090,6 +1091,24 @@ dialog.modal {
   box-shadow: var(--sombra-hover);
   background: var(--superficie);
   color: var(--texto);
+  overflow: hidden;
+}
+
+/* display precisa ficar restrito a [open]: uma regra de autor "display"
+   sem essa condicao venceria o "dialog:not([open]) { display: none }" do
+   user-agent (autor sempre vence UA, independente de especificidade),
+   deixando o dialog visivel mesmo fechado. */
+dialog.modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* O modal de produto envolve cabecalho/corpo/rodape em <form>. display:contents
+   remove a caixa do form (que herdaria display:flex + gap da regra generica
+   de "form" e desalinharia as contas de altura) sem remover seus filhos,
+   que passam a ser filhos diretos do flex column acima. */
+dialog.modal > form {
+  display: contents;
 }
 
 dialog.modal.modal-pequeno {
@@ -1101,6 +1120,7 @@ dialog.modal::backdrop {
 }
 
 .modal-cabecalho {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1138,9 +1158,10 @@ dialog.modal::backdrop {
 }
 
 .modal-corpo {
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 20px;
   overflow-y: auto;
-  max-height: calc(88vh - 130px);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -1174,6 +1195,7 @@ dialog.modal::backdrop {
 }
 
 .modal-rodape {
+  flex: 0 0 auto;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -2006,8 +2028,36 @@ dialog.modal::backdrop {
   }
 
   .stepper-btn {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Áreas de toque confortáveis (~44px) para controles importantes no
+   mobile/tablet: menu de ações, fechar modal, formas de pagamento e itens
+   de dropdown. Acima do breakpoint de 860px mantém o tamanho compacto de
+   desktop (mouse é mais preciso que dedo). */
+@media (max-width: 859px) {
+  .menu-acoes-toggle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .modal-fechar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pdv-pag-btn {
+    min-height: 44px;
+  }
+
+  .menu-acoes-dropdown button {
+    min-height: 44px;
+  }
+
+  .btn {
+    min-height: 44px;
   }
 }
 
@@ -2523,6 +2573,14 @@ dialog.modal::backdrop {
   color: var(--vermelho);
   font-size: 0.85rem;
   font-weight: 600;
+}
+
+.rotulo-em-breve {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
 }
 
 .relatorio-grafico-card #grafico-relatorio {

@@ -302,6 +302,10 @@
     evento.preventDefault();
     limparErroModal();
 
+    const botaoSalvar = document.getElementById('btn-salvar-produto');
+    if (botaoSalvar.disabled) return;
+    botaoSalvar.disabled = true;
+
     const id = document.getElementById('produto-id').value;
     const dados = {
       nome: document.getElementById('nome').value.trim(),
@@ -335,6 +339,8 @@
       carregarProdutos();
     } catch (err) {
       mostrarErroModal('Não foi possível salvar o produto. Tente novamente.');
+    } finally {
+      botaoSalvar.disabled = false;
     }
   });
 
@@ -360,7 +366,10 @@
   document.getElementById('btn-cancelar-reposicao').addEventListener('click', () => modalReposicao.close());
   document.getElementById('fechar-modal-reposicao').addEventListener('click', () => modalReposicao.close());
 
-  document.getElementById('btn-confirmar-reposicao').addEventListener('click', async () => {
+  document.getElementById('btn-confirmar-reposicao').addEventListener('click', async (evento) => {
+    const botao = evento.currentTarget;
+    if (botao.disabled) return;
+
     const qtd = Number(document.getElementById('reposicao-quantidade').value);
     const erroEl = document.getElementById('reposicao-erro');
 
@@ -370,6 +379,7 @@
       return;
     }
 
+    botao.disabled = true;
     try {
       await api.registrarCompra(produtoAlvo.id, qtd);
       modalReposicao.close();
@@ -378,6 +388,8 @@
     } catch (err) {
       erroEl.textContent = 'Não foi possível repor o estoque.';
       erroEl.hidden = false;
+    } finally {
+      botao.disabled = false;
     }
   });
 
@@ -408,7 +420,10 @@
   document.getElementById('btn-cancelar-descarte').addEventListener('click', () => modalDescarte.close());
   document.getElementById('fechar-modal-descarte').addEventListener('click', () => modalDescarte.close());
 
-  document.getElementById('btn-confirmar-descarte').addEventListener('click', async () => {
+  document.getElementById('btn-confirmar-descarte').addEventListener('click', async (evento) => {
+    const botao = evento.currentTarget;
+    if (botao.disabled) return;
+
     const qtd = Number(document.getElementById('descarte-quantidade').value);
     const motivo = document.getElementById('descarte-motivo').value.trim() || null;
     const erroEl = document.getElementById('descarte-erro');
@@ -424,14 +439,17 @@
       return;
     }
 
+    botao.disabled = true;
     try {
       await api.registrarDescarte(produtoAlvo.id, qtd, motivo);
       modalDescarte.close();
       mostrarMensagem('Descarte registrado com sucesso.', 'sucesso');
       carregarProdutos();
     } catch (err) {
-      erroEl.textContent = err.message || 'Não foi possível registrar o descarte.';
+      erroEl.textContent = mensagemErroAmigavel(err, 'Não foi possível registrar o descarte.');
       erroEl.hidden = false;
+    } finally {
+      botao.disabled = false;
     }
   });
 

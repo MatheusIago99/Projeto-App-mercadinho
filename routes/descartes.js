@@ -82,7 +82,10 @@ router.post('/', (req, res) => {
     res.status(201).json({ ok: true });
   } catch (err) {
     db.exec('ROLLBACK');
-    res.status(400).json({ erro: err.message });
+    // Tudo que pode falhar por entrada invalida ja foi validado antes do
+    // BEGIN; qualquer erro aqui e inesperado, nunca deve expor texto tecnico.
+    console.error('Falha inesperada ao registrar descarte:', err);
+    res.status(400).json({ erro: 'Não foi possível registrar o descarte.' });
   }
 });
 

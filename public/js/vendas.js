@@ -413,7 +413,7 @@ btnFinalizar.addEventListener('click', async () => {
     await carregarProdutos();
     await carregarVendas();
   } catch (err) {
-    mostrarMensagem(err.message, 'erro');
+    mostrarMensagem(mensagemErroAmigavel(err, 'Não foi possível finalizar a venda.'), 'erro');
   } finally {
     enviando = false;
     atualizarBotaoFinalizar();
@@ -489,6 +489,8 @@ document.getElementById('fechar-modal-venda').addEventListener('click', () => mo
 async function inicializar() {
   await carregarProdutos();
   await carregarVendas();
+  renderCarrinho();
+  renderResumo();
   refocarScanner();
 }
 

@@ -8,7 +8,6 @@
   const inputDataFinal = document.getElementById('data-final');
   const btnAplicarPeriodo = document.getElementById('btn-aplicar-periodo');
   const periodoErroEl = document.getElementById('periodo-erro');
-  const btnExportar = document.getElementById('btn-exportar');
 
   let periodo = { inicio: somarDiasISO(-6), fim: hojeDataISO() };
 
@@ -98,9 +97,9 @@
     aplicarPeriodo(inputDataInicial.value, inputDataFinal.value);
   });
 
-  btnExportar.addEventListener('click', () => {
-    mostrarMensagem('Exportação em desenvolvimento. Em breve você poderá exportar este relatório.', 'sucesso');
-  });
+  // Exportação ainda não implementada nesta versão (ver relatório da Fase
+  // 6): o botão fica visivelmente desabilitado em vez de parecer
+  // funcional sem fazer nada.
 
   // ---------- KPIs ----------
 
@@ -260,7 +259,7 @@
       renderConteudo('lista-menor-saida', graficoMenorSaida(relatorio.menorSaida));
       renderConteudo('lista-pagamentos', graficoFormasPagamento(relatorio.formasPagamento, relatorio.resumo.faturamento));
     } catch (err) {
-      const mensagem = err.message || 'Não foi possível carregar o relatório de vendas.';
+      const mensagem = mensagemErroAmigavel(err, 'Não foi possível carregar o relatório de vendas.');
       el('kpi-grid-relatorios').innerHTML = '';
       el('kpi-grid-relatorios').appendChild(blocoErro(mensagem, carregarRelatorioVendas));
       renderErro('grafico-relatorio', mensagem, carregarRelatorioVendas);

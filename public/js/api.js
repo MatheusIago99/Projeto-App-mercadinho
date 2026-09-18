@@ -90,6 +90,16 @@ function escapeHtml(texto) {
   return String(texto).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+// Quando o backend responde (mesmo com erro), dados.erro ja e uma mensagem
+// em portugues pensada para o usuario. Mas se o fetch() em si falhar antes
+// de qualquer resposta (rede indisponivel, sem o service worker ainda
+// ativo para converter isso num 503 amigavel), o navegador rejeita com um
+// TypeError cru ("Failed to fetch" etc.) — nunca mostrar esse texto tecnico.
+function mensagemErroAmigavel(err, padrao) {
+  if (err instanceof TypeError) return 'Não foi possível conectar ao servidor. Verifique sua conexão.';
+  return err.message || padrao;
+}
+
 // Gráfico de barras (SVG inline) reutilizado pelo Início e por Relatórios,
 // para não duplicar a mesma lógica de desenho em dois arquivos.
 function corMarca() {
