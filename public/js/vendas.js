@@ -169,25 +169,12 @@ document.addEventListener('click', (e) => {
 
 // --- Carrinho ---------------------------------------------------------------
 
-// Mesma interpretacao de validade usada no backend (routes/vendas.js) e em
-// routes/alertas.js: comparacao por data de calendario, sem hora — produto
-// que vence hoje ainda pode ser vendido. Validacao no cliente e so
-// conveniencia; a definitiva acontece sempre no POST /api/vendas.
-function hojeData() {
-  const agora = new Date();
-  const ano = agora.getFullYear();
-  const mes = String(agora.getMonth() + 1).padStart(2, '0');
-  const dia = String(agora.getDate()).padStart(2, '0');
-  return `${ano}-${mes}-${dia}`;
-}
-
-function produtoVencido(produto) {
-  if (!produto.validade) return false;
-  return produto.validade.slice(0, 10) < hojeData();
-}
-
 function adicionarProduto(produto, quantidadeAdicional) {
-  if (produtoVencido(produto)) {
+  // validadeEstaVencida() vem de api.js: mesma interpretacao de validade
+  // usada no backend (routes/vendas.js, utils/validade.js) e no restante do
+  // frontend (calcularStatusProduto). Validacao no cliente e so
+  // conveniencia; a definitiva acontece sempre no POST /api/vendas.
+  if (validadeEstaVencida(produto.validade)) {
     mostrarMensagem(
       `Este produto está vencido e não pode ser vendido. Validade: ${formatarData(produto.validade)}`,
       'erro'

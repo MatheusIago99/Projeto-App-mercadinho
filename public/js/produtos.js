@@ -71,13 +71,16 @@
     return todosProdutos.filter((p) => {
       const bateBusca = !busca || p.nome.toLowerCase().includes(busca) || (p.codigo_barras || '').toLowerCase().includes(busca);
       const bateCategoria = !categoria || p.categoria === categoria;
-      const bateStatus = !status || calcularStatusProduto(p) === status;
+      const statusProduto = calcularStatusProduto(p);
+      // "Vencendo" cobre tambem "vence hoje": sao o mesmo nivel de atencao,
+      // so com rotulo de badge diferente.
+      const bateStatus = !status || statusProduto === status || (status === 'vencendo' && statusProduto === 'vencendo_hoje');
 
       let bateValidade = true;
       if (validade === 'sem_validade') bateValidade = !p.validade;
       else if (validade === 'com_validade') bateValidade = !!p.validade;
-      else if (validade === 'vencidos') bateValidade = calcularStatusProduto(p) === 'vencido';
-      else if (validade === 'vencendo') bateValidade = calcularStatusProduto(p) === 'vencendo';
+      else if (validade === 'vencidos') bateValidade = statusProduto === 'vencido';
+      else if (validade === 'vencendo') bateValidade = statusProduto === 'vencendo' || statusProduto === 'vencendo_hoje';
 
       return bateBusca && bateCategoria && bateStatus && bateValidade;
     });
