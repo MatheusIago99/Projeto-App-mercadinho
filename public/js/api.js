@@ -130,17 +130,45 @@ function graficoFaturamento(porDia) {
     </svg>`;
 }
 
-// Status do produto (para a listagem de Produtos): usa a MESMA
-// interpretação de datas de validade já consolidada em routes/alertas.js
-// (vencido = validade < hoje; vencendo = validade entre hoje e +7 dias),
-// só que combinada com a prioridade visual pedida para a tabela.
+// Interpretação única de validade usada por todo o frontend (Dashboard,
+// Produtos, Vendas): comparação por DATA DE CALENDÁRIO (ano/mes/dia), nunca
+// por hora/minuto/segundo. Regra: validade < hoje => vencido; validade ===
+// hoje => NÃO vencido (mesma regra aplicada no backend em utils/validade.js).
 const DIAS_ALERTA_VALIDADE = 7;
+
+function formatarDataISO(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const dia = String(data.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
+}
+
+function hojeDataISO() {
+  return formatarDataISO(new Date());
+}
+
+function somarDiasISO(dias) {
+  const data = new Date();
+  data.setDate(data.getDate() + dias);
+  return formatarDataISO(data);
+}
+
+function validadeEstaVencida(validade) {
+  if (!validade) return false;
+  return validade.slice(0, 10) < hojeDataISO();
+}
+
+function validadeVenceHoje(validade) {
+  if (!validade) return false;
+  return validade.slice(0, 10) === hojeDataISO();
+}
 
 const STATUS_ROTULOS = {
   normal: 'Normal',
   estoque_baixo: 'Estoque baixo',
   sem_estoque: 'Sem estoque',
   vencendo: 'Vencendo',
+  vencendo_hoje: 'Vence hoje',
   vencido: 'Vencido',
 };
 
@@ -149,18 +177,14 @@ const STATUS_CORES = {
   estoque_baixo: 'amarelo',
   sem_estoque: 'vermelho',
   vencendo: 'amarelo',
+  vencendo_hoje: 'amarelo',
   vencido: 'vermelho',
 };
 
 function calcularStatusProduto(produto) {
-  const hoje = new Date();
-  const limite = new Date();
-  limite.setDate(hoje.getDate() + DIAS_ALERTA_VALIDADE);
-
-  const dataValidade = produto.validade ? new Date(produto.validade) : null;
-
-  if (dataValidade && dataValidade < hoje) return 'vencido';
-  if (dataValidade && dataValidade >= hoje && dataValidade <= limite) return 'vencendo';
+  if (validadeEstaVencida(produto.validade)) return 'vencido';
+  if (validadeVenceHoje(produto.validade)) return 'vencendo_hoje';
+  if (produto.validade && produto.validade.slice(0, 10) <= somarDiasISO(DIAS_ALERTA_VALIDADE)) return 'vencendo';
   if (produto.quantidade === 0) return 'sem_estoque';
   if (produto.quantidade <= produto.estoque_minimo) return 'estoque_baixo';
   return 'normal';
