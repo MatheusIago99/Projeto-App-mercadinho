@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../db/database');
+const { estaProximoDaValidade } = require('../utils/validade');
 
 const router = express.Router();
 
@@ -60,17 +61,10 @@ router.get('/', (req, res) => {
   if (resultado.length < LIMITE_EVENTOS) {
     const produtos = db.prepare('SELECT nome, quantidade, estoque_minimo, validade FROM produtos').all();
 
-    // Mesma comparacao de datas usada em routes/alertas.js, para os dois
-    // widgets do dashboard nunca discordarem sobre o mesmo produto.
-    const hoje = new Date();
-    const limite = new Date();
-    limite.setDate(hoje.getDate() + DIAS_ALERTA_VALIDADE);
-
+    // Mesma regra centralizada de utils/validade.js usada em routes/alertas.js,
+    // para os dois widgets do dashboard nunca discordarem sobre o mesmo produto.
     const baixos = produtos.filter((p) => p.quantidade <= p.estoque_minimo);
-    const vencendo = produtos.filter((p) => {
-      if (!p.validade) return false;
-      return new Date(p.validade) >= hoje && new Date(p.validade) <= limite;
-    });
+    const vencendo = produtos.filter((p) => estaProximoDaValidade(p.validade, DIAS_ALERTA_VALIDADE));
 
     const extras = [];
     if (baixos.length > 0) {

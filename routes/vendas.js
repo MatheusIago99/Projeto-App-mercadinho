@@ -6,6 +6,11 @@ const router = express.Router();
 
 const FORMAS_PAGAMENTO = ['PIX', 'DINHEIRO', 'DEBITO', 'CREDITO'];
 
+// Marca mensagens de validacao pensadas para o usuario final. Qualquer
+// outro erro dentro da transacao (ex.: falha inesperada do banco) nunca
+// deve expor texto tecnico cru na resposta.
+class ErroValidacao extends Error {}
+
 router.get('/', (req, res) => {
   const vendas = db.prepare('SELECT * FROM vendas ORDER BY data DESC').all();
   const itensStmt = db.prepare(
@@ -55,22 +60,22 @@ router.post('/', (req, res) => {
     // aqui dentro, na mesma transacao, com os dados atuais do banco.
     for (const item of itens) {
       if (!Number.isInteger(item.quantidade) || item.quantidade <= 0) {
-        throw new Error('Quantidade inválida para um dos itens da venda.');
+        throw new ErroValidacao('Quantidade inválida para um dos itens da venda.');
       }
       const produto = buscarProduto.get(item.produto_id);
-      if (!produto) throw new Error(`Produto ${item.produto_id} não encontrado`);
+      if (!produto) throw new ErroValidacao(`Produto ${item.produto_id} não encontrado`);
       if (estaVencido(produto.validade)) {
-        throw new Error(`Produto vencido: ${produto.nome}. Validade: ${formatarDataBR(produto.validade)}.`);
+        throw new ErroValidacao(`Produto vencido: ${produto.nome}. Validade: ${formatarDataBR(produto.validade)}.`);
       }
       if (produto.quantidade < item.quantidade) {
-        throw new Error(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.quantidade}.`);
+        throw new ErroValidacao(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.quantidade}.`);
       }
       total += produto.preco * item.quantidade;
       detalhes.push({ produto, quantidade: item.quantidade });
     }
 
     if (forma_pagamento === 'DINHEIRO' && valorRecebidoBruto < total) {
-      throw new Error('O valor recebido é menor que o total da venda.');
+      throw new ErroValidacao('O valor recebido é menor que o total da venda.');
     }
 
     const venda = criarVenda.run(total, forma_pagamento, forma_pagamento === 'DINHEIRO' ? valorRecebidoBruto : null);
@@ -86,7 +91,12 @@ router.post('/', (req, res) => {
     res.status(201).json(vendaCriada);
   } catch (err) {
     db.exec('ROLLBACK');
-    res.status(400).json({ erro: err.message });
+    if (err instanceof ErroValidacao) {
+      res.status(400).json({ erro: err.message });
+    } else {
+      console.error('Falha inesperada ao registrar venda:', err);
+      res.status(400).json({ erro: 'Não foi possível finalizar a venda.' });
+    }
   }
 });
 
