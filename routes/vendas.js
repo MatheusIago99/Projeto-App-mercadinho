@@ -5,6 +5,27 @@ const router = express.Router();
 
 const FORMAS_PAGAMENTO = ['PIX', 'DINHEIRO', 'DEBITO', 'CREDITO'];
 
+// Mesma interpretacao de validade consolidada em routes/alertas.js
+// (vencido = validade anterior a hoje), normalizada para comparacao por
+// DATA de calendario (sem hora): produto que vence hoje NAO esta vencido.
+function hojeData() {
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const dia = String(agora.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
+}
+
+function estaVencido(validade) {
+  if (!validade) return false;
+  return validade.slice(0, 10) < hojeData();
+}
+
+function formatarDataBR(iso) {
+  const [ano, mes, dia] = iso.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
 router.get('/', (req, res) => {
   const vendas = db.prepare('SELECT * FROM vendas ORDER BY data DESC').all();
   const itensStmt = db.prepare(
@@ -58,6 +79,9 @@ router.post('/', (req, res) => {
       }
       const produto = buscarProduto.get(item.produto_id);
       if (!produto) throw new Error(`Produto ${item.produto_id} não encontrado`);
+      if (estaVencido(produto.validade)) {
+        throw new Error(`Produto vencido: ${produto.nome}. Validade: ${formatarDataBR(produto.validade)}.`);
+      }
       if (produto.quantidade < item.quantidade) {
         throw new Error(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.quantidade}.`);
       }
