@@ -30,11 +30,11 @@ const api = {
     });
     return res.json();
   },
-  async registrarVenda(itens) {
+  async registrarVenda({ itens, forma_pagamento, valor_recebido }) {
     const res = await fetch('/api/vendas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ itens }),
+      body: JSON.stringify({ itens, forma_pagamento, valor_recebido }),
     });
     const dados = await res.json();
     if (!res.ok) throw new Error(dados.erro || 'Erro ao registrar venda');

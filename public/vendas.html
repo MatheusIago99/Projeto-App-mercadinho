@@ -24,27 +24,116 @@
       <span class="logo-icone" aria-hidden="true"></span>
       <div>
         <h1>Registrar venda</h1>
-        <span>A baixa no estoque é automática</span>
+        <span>A baixa no estoque é automática.</span>
       </div>
     </div>
   </header>
 
-  <main>
-    <div id="mensagens"></div>
+  <main class="main-largo">
+    <div id="mensagens" role="status" aria-live="polite"></div>
 
-    <section class="card">
-      <h2>Itens da venda</h2>
-      <div id="itens-venda"></div>
-      <button type="button" class="btn secundario" id="btn-add-item">+ Adicionar item</button>
-      <div class="total" id="total-venda">Total: R$ 0,00</div>
-      <button type="button" class="btn" id="btn-finalizar">Finalizar venda</button>
-    </section>
+    <div id="pdv-sem-produtos" class="estado-vazio" hidden>
+      <div class="estado-vazio-icone" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+      <h3>Nenhum produto disponível para venda.</h3>
+      <p>Cadastre produtos para começar a vender.</p>
+      <a class="btn" href="/produtos.html">Cadastrar produto</a>
+    </div>
 
-    <section class="card">
+    <div id="pdv-conteudo" class="pdv-grid">
+      <div class="pdv-coluna-principal">
+        <section class="card pdv-scanner-card">
+          <label for="scanner-input" class="pdv-scanner-label">Buscar produto</label>
+          <div class="pdv-scanner-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M11 4v16M16 4v3M16 11v9M20 4v6M20 14v6"/></svg>
+            <input
+              type="text"
+              id="scanner-input"
+              placeholder="Digite ou escaneie o código de barras do produto..."
+              aria-label="Digite ou escaneie o código de barras do produto"
+              autocomplete="off"
+            />
+          </div>
+          <ul id="sugestoes-produtos" class="pdv-sugestoes" hidden role="listbox" aria-label="Sugestões de produtos"></ul>
+        </section>
+
+        <section class="card pdv-carrinho-card">
+          <h2>Carrinho</h2>
+          <div id="carrinho-container"></div>
+        </section>
+      </div>
+
+      <aside class="pdv-coluna-resumo">
+        <section class="card pdv-resumo-card">
+          <h2>Resumo da venda</h2>
+
+          <div class="resumo-linha">
+            <span>Itens</span>
+            <strong id="resumo-itens">0 itens</strong>
+          </div>
+          <div class="resumo-linha">
+            <span>Subtotal</span>
+            <strong id="resumo-subtotal">R$ 0,00</strong>
+          </div>
+
+          <div class="pdv-pagamento">
+            <span class="pdv-pagamento-titulo">Forma de pagamento</span>
+            <div class="pdv-pagamento-botoes" role="group" aria-label="Forma de pagamento">
+              <button type="button" class="pdv-pag-btn" data-forma="PIX" aria-pressed="false">Pix</button>
+              <button type="button" class="pdv-pag-btn" data-forma="DINHEIRO" aria-pressed="false">Dinheiro</button>
+              <button type="button" class="pdv-pag-btn" data-forma="DEBITO" aria-pressed="false">Débito</button>
+              <button type="button" class="pdv-pag-btn" data-forma="CREDITO" aria-pressed="false">Crédito</button>
+            </div>
+          </div>
+
+          <div id="pdv-dinheiro-campos" class="pdv-dinheiro" hidden>
+            <label for="valor-recebido">Valor recebido (R$)</label>
+            <input type="number" id="valor-recebido" min="0" step="0.01" inputmode="decimal" placeholder="0,00" />
+            <div class="resumo-linha destaque" id="pdv-troco-linha">
+              <span>Troco</span>
+              <strong id="pdv-troco">R$ 0,00</strong>
+            </div>
+            <p id="pdv-troco-aviso" class="pdv-aviso" hidden>Valor recebido insuficiente.</p>
+          </div>
+
+          <div class="pdv-total">
+            <span>Total</span>
+            <strong id="pdv-total">R$ 0,00</strong>
+          </div>
+
+          <button type="button" class="btn pdv-btn-finalizar" id="btn-finalizar" disabled>Finalizar venda</button>
+          <button type="button" class="pdv-limpar" id="btn-limpar-carrinho">Limpar venda</button>
+        </section>
+      </aside>
+    </div>
+
+    <section class="card pdv-ultimas-vendas">
       <h2>Últimas vendas</h2>
       <div id="lista-vendas" class="vazio">Carregando...</div>
     </section>
   </main>
+
+  <!-- Modal: detalhe de venda -->
+  <dialog id="modal-venda-detalhe" class="modal modal-pequeno" aria-labelledby="modal-venda-titulo">
+    <div class="modal-cabecalho">
+      <h2 id="modal-venda-titulo">Venda</h2>
+      <button type="button" class="modal-fechar" id="fechar-modal-venda" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-corpo">
+      <div id="venda-detalhe-itens" class="pdv-detalhe-itens"></div>
+      <div class="resumo-linha">
+        <span>Forma de pagamento</span>
+        <strong id="venda-detalhe-pagamento">-</strong>
+      </div>
+      <div class="resumo-linha destaque">
+        <span>Total</span>
+        <strong id="venda-detalhe-total">R$ 0,00</strong>
+      </div>
+    </div>
+  </dialog>
 
   <script src="/js/layout.js"></script>
   <script src="/js/api.js"></script>

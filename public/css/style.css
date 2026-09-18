@@ -1745,6 +1745,436 @@ dialog.modal::backdrop {
   }
 }
 
+/* PDV / Vendas */
+
+.pdv-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pdv-grid[hidden] {
+  display: none;
+}
+
+.pdv-coluna-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pdv-scanner-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.pdv-scanner-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pdv-scanner-wrap svg {
+  position: absolute;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  color: var(--cinza-suave);
+  pointer-events: none;
+}
+
+#scanner-input {
+  padding: 14px 14px 14px 42px;
+  font-size: 1rem;
+}
+
+.pdv-sugestoes {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  overflow: hidden;
+  box-shadow: var(--sombra);
+  background: var(--superficie);
+  animation: surgir 0.15s ease both;
+}
+
+.pdv-sugestao-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--borda);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.pdv-sugestao-item:last-child {
+  border-bottom: none;
+}
+
+.pdv-sugestao-item:hover,
+.pdv-sugestao-item:focus {
+  background: var(--superficie-alt);
+  outline: none;
+}
+
+.pdv-sugestao-info {
+  flex: 0 0 auto;
+  font-weight: 500;
+  color: var(--cinza);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.pdv-carrinho-vazio {
+  padding: 40px 20px;
+  box-shadow: none;
+  border-style: dashed;
+}
+
+/* Carrinho: tabela -> cards no mobile, seguindo o mesmo padrão de Produtos */
+
+.tabela-carrinho-container {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.tabela-carrinho {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela-carrinho th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cinza);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+.tabela-carrinho td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borda);
+  font-size: 0.88rem;
+  vertical-align: middle;
+}
+
+.tabela-carrinho tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabela-carrinho tbody tr:hover {
+  background: var(--superficie-alt);
+}
+
+.col-total-item {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.col-acoes-carrinho {
+  text-align: right;
+  width: 1%;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--borda);
+  background: var(--superficie-alt);
+  color: var(--texto);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.12s ease, transform 0.12s ease;
+}
+
+.stepper-btn:hover {
+  background: var(--borda);
+}
+
+.stepper-btn:active {
+  transform: scale(0.95);
+}
+
+.stepper-valor {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 859px) {
+  .tabela-carrinho-container {
+    background: none;
+    border: none;
+  }
+
+  .tabela-carrinho thead {
+    display: none;
+  }
+
+  .tabela-carrinho,
+  .tabela-carrinho tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .tabela-carrinho tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'produto acoes'
+      'quantidade quantidade'
+      'unitario total';
+    gap: 8px 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-sm);
+    box-shadow: var(--sombra);
+  }
+
+  .tabela-carrinho tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .tabela-carrinho td {
+    display: block;
+    padding: 0;
+    border: none;
+    font-size: 0.85rem;
+  }
+
+  .col-produto {
+    grid-area: produto;
+  }
+
+  .col-quantidade {
+    grid-area: quantidade;
+  }
+
+  .col-unitario {
+    grid-area: unitario;
+    color: var(--cinza);
+  }
+
+  .col-unitario::before {
+    content: 'Unitário: ';
+    color: var(--cinza-suave);
+    font-weight: 600;
+  }
+
+  .col-total-item {
+    grid-area: total;
+    text-align: right;
+    font-size: 0.95rem;
+  }
+
+  .col-acoes-carrinho {
+    grid-area: acoes;
+    text-align: right;
+    align-self: start;
+  }
+
+  .stepper-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* Resumo da venda / pagamento */
+
+.pdv-resumo-card {
+  position: relative;
+}
+
+.pdv-pagamento {
+  margin: 16px 0 4px;
+}
+
+.pdv-pagamento-titulo {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.pdv-pagamento-botoes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.pdv-pag-btn {
+  padding: 12px 8px;
+  border-radius: var(--raio-sm);
+  border: 1.5px solid var(--borda);
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.pdv-pag-btn:hover {
+  border-color: var(--verde);
+}
+
+.pdv-pag-btn.selecionado {
+  background: var(--verde-clara);
+  border-color: var(--verde);
+  color: var(--verde-escura);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pdv-pag-btn.selecionado {
+    color: var(--verde);
+  }
+}
+
+.pdv-dinheiro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0 4px;
+  animation: surgir 0.2s ease both;
+}
+
+.pdv-dinheiro[hidden] {
+  display: none;
+}
+
+.pdv-aviso {
+  margin: -4px 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vermelho);
+}
+
+.pdv-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 18px 0 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--borda);
+}
+
+.pdv-total span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pdv-total strong {
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--verde-escura);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pdv-total strong {
+    color: var(--verde);
+  }
+}
+
+.pdv-btn-finalizar {
+  width: 100%;
+  font-size: 1rem;
+  padding: 14px 16px;
+}
+
+.pdv-limpar {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--cinza);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  padding: 6px;
+  font-family: inherit;
+}
+
+.pdv-limpar:hover {
+  color: var(--vermelho);
+  text-decoration: underline;
+}
+
+.pdv-detalhe-itens {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lista-item-venda {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+@media (min-width: 860px) {
+  .pdv-grid {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 22px;
+    align-items: start;
+  }
+
+  .pdv-coluna-resumo {
+    position: sticky;
+    top: 20px;
+  }
+
+  #scanner-input {
+    padding: 16px 16px 16px 46px;
+    font-size: 1.05rem;
+  }
+}
+
 /* Painel web: navegação em barra lateral a partir de telas largas.
    Abaixo desse ponto de quebra, o layout mobile (nav flutuante embaixo)
    continua exatamente como antes. */

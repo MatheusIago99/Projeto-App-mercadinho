@@ -28,6 +28,12 @@ function migrar() {
   if (!colunaExiste('produtos', 'codigo_barras')) {
     db.exec('ALTER TABLE produtos ADD COLUMN codigo_barras TEXT');
   }
+  if (!colunaExiste('vendas', 'forma_pagamento')) {
+    db.exec('ALTER TABLE vendas ADD COLUMN forma_pagamento TEXT');
+  }
+  if (!colunaExiste('vendas', 'valor_recebido')) {
+    db.exec('ALTER TABLE vendas ADD COLUMN valor_recebido REAL');
+  }
 }
 
 migrar();
