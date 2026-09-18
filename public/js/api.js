@@ -1,10 +1,24 @@
+// Toda chamada a /api/* (exceto /api/auth, tratado à parte em login.js e
+// layout.js) passa por aqui. Se a sessão expirou (401), não faz sentido
+// deixar cada tela tratar isso individualmente: redireciona direto para o
+// login, sem mostrar erro técnico. A promise nunca resolve nesse caso —
+// a navegação já está em andamento.
+async function apiFetch(url, options) {
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    return new Promise(() => {});
+  }
+  return res;
+}
+
 const api = {
   async listarProdutos() {
-    const res = await fetch('/api/produtos');
+    const res = await apiFetch('/api/produtos');
     return res.json();
   },
   async criarProduto(produto) {
-    const res = await fetch('/api/produtos', {
+    const res = await apiFetch('/api/produtos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(produto),
@@ -12,7 +26,7 @@ const api = {
     return res.json();
   },
   async atualizarProduto(id, produto) {
-    const res = await fetch(`/api/produtos/${id}`, {
+    const res = await apiFetch(`/api/produtos/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(produto),
@@ -20,10 +34,10 @@ const api = {
     return res.json();
   },
   async excluirProduto(id) {
-    return fetch(`/api/produtos/${id}`, { method: 'DELETE' });
+    return apiFetch(`/api/produtos/${id}`, { method: 'DELETE' });
   },
   async registrarCompra(produto_id, quantidade) {
-    const res = await fetch('/api/compras', {
+    const res = await apiFetch('/api/compras', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ produto_id, quantidade }),
@@ -31,7 +45,7 @@ const api = {
     return res.json();
   },
   async registrarVenda({ itens, forma_pagamento, valor_recebido }) {
-    const res = await fetch('/api/vendas', {
+    const res = await apiFetch('/api/vendas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ itens, forma_pagamento, valor_recebido }),
@@ -41,27 +55,27 @@ const api = {
     return dados;
   },
   async listarVendas() {
-    const res = await fetch('/api/vendas');
+    const res = await apiFetch('/api/vendas');
     return res.json();
   },
   async listarAlertas() {
-    const res = await fetch('/api/alertas');
+    const res = await apiFetch('/api/alertas');
     return res.json();
   },
   async relatorioVendas(inicio, fim) {
     const params = new URLSearchParams({ inicio, fim });
-    const res = await fetch(`/api/relatorios/vendas?${params}`);
+    const res = await apiFetch(`/api/relatorios/vendas?${params}`);
     const dados = await res.json();
     if (!res.ok) throw new Error(dados.erro || 'Erro ao carregar relatório');
     return dados;
   },
   async listarDescartes(inicio, fim) {
     const params = inicio && fim ? `?${new URLSearchParams({ inicio, fim })}` : '';
-    const res = await fetch(`/api/descartes${params}`);
+    const res = await apiFetch(`/api/descartes${params}`);
     return res.json();
   },
   async registrarDescarte(produto_id, quantidade, motivo) {
-    const res = await fetch('/api/descartes', {
+    const res = await apiFetch('/api/descartes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ produto_id, quantidade, motivo }),
@@ -71,7 +85,7 @@ const api = {
     return dados;
   },
   async listarMovimentacoes() {
-    const res = await fetch('/api/movimentacoes');
+    const res = await apiFetch('/api/movimentacoes');
     return res.json();
   },
 };

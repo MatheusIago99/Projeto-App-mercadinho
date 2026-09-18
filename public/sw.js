@@ -1,10 +1,14 @@
-const CACHE_NAME = 'smartestoque-v5';
+const CACHE_NAME = 'smartestoque-v6';
 
+// As 4 páginas protegidas (index/produtos/vendas/relatorios) NÃO entram
+// aqui: o servidor responde a elas com um redirect para /login.html
+// quando não há sessão, e um precache anônimo no "install" seguiria esse
+// redirect e guardaria o HTML do login sob a chave errada (ex.:
+// "/index.html" -> conteúdo de login.html). Elas continuam sendo cacheadas
+// normalmente pelo fluxo network-first abaixo, só que de forma lazy, na
+// primeira vez que forem carregadas com sessão válida.
 const ASSETS = [
-  '/index.html',
-  '/produtos.html',
-  '/vendas.html',
-  '/relatorios.html',
+  '/login.html',
   '/css/style.css',
   '/js/layout.js',
   '/js/api.js',
@@ -12,6 +16,7 @@ const ASSETS = [
   '/js/produtos.js',
   '/js/vendas.js',
   '/js/relatorios.js',
+  '/js/login.js',
   '/js/pwa.js',
   '/js/splash.js',
   '/manifest.json',
@@ -60,8 +65,14 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((daRede) => {
-        const copia = daRede.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copia));
+        // Se a resposta veio de um redirect (ex.: página protegida sem
+        // sessão -> /login.html), NUNCA cacheia sob a URL original: isso
+        // guardaria o HTML do login como se fosse o conteúdo da página
+        // protegida, e um acesso offline futuro serviria o login errado.
+        if (!daRede.redirected) {
+          const copia = daRede.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copia));
+        }
         return daRede;
       })
       .catch(
