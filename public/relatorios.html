@@ -24,29 +24,86 @@
       <span class="logo-icone" aria-hidden="true"></span>
       <div>
         <h1>Relatórios</h1>
-        <span>Vendas e desperdício dos últimos 14 dias</span>
+        <span>Sua central gerencial</span>
       </div>
     </div>
   </header>
 
-  <main>
-    <div id="mensagens"></div>
+  <main class="main-largo">
+    <div id="mensagens" role="status" aria-live="polite"></div>
 
-    <section class="card">
-      <h2>Faturamento</h2>
-      <div class="stat-destaque" id="stat-faturamento">R$ 0,00</div>
-      <div id="grafico-faturamento" class="vazio">Carregando...</div>
+    <section class="pagina-cabecalho">
+      <div>
+        <h2>Relatórios</h2>
+        <p>Vendas, lucro estimado e desperdício do período selecionado.</p>
+      </div>
+      <button type="button" class="btn secundario" id="btn-exportar">Exportar</button>
     </section>
 
-    <section class="card">
-      <h2>Produtos mais vendidos</h2>
-      <div id="grafico-mais-vendidos" class="vazio">Carregando...</div>
+    <section class="card relatorio-filtros">
+      <div class="periodo-botoes" role="group" aria-label="Período do relatório">
+        <button type="button" class="periodo-btn" data-periodo="hoje">Hoje</button>
+        <button type="button" class="periodo-btn" data-periodo="7">7 dias</button>
+        <button type="button" class="periodo-btn" data-periodo="30">30 dias</button>
+        <button type="button" class="periodo-btn" data-periodo="personalizado">Personalizado</button>
+      </div>
+      <div class="periodo-personalizado" id="periodo-personalizado" hidden>
+        <label for="data-inicial">Data inicial</label>
+        <input type="date" id="data-inicial" />
+        <label for="data-final">Data final</label>
+        <input type="date" id="data-final" />
+        <button type="button" class="btn" id="btn-aplicar-periodo">Aplicar</button>
+      </div>
+      <p class="periodo-erro" id="periodo-erro" hidden></p>
     </section>
 
+    <div class="kpi-grid" id="kpi-grid-relatorios"></div>
+
+    <section class="card relatorio-grafico-card">
+      <div class="card-cabecalho">
+        <h2>Faturamento no período</h2>
+      </div>
+      <div id="grafico-relatorio" class="vazio">Carregando...</div>
+    </section>
+
+    <div class="relatorios-grid-2col">
+      <section class="card">
+        <div class="card-cabecalho">
+          <h2>Produtos mais vendidos</h2>
+        </div>
+        <div id="lista-mais-vendidos" class="vazio">Carregando...</div>
+      </section>
+
+      <section class="card">
+        <div class="card-cabecalho">
+          <h2>Formas de pagamento</h2>
+        </div>
+        <div id="lista-pagamentos" class="vazio">Carregando...</div>
+      </section>
+    </div>
+
+    <div class="relatorios-grid-2col">
+      <section class="card">
+        <div class="card-cabecalho">
+          <h2>Produtos com menor saída</h2>
+        </div>
+        <div id="lista-menor-saida" class="vazio">Carregando...</div>
+      </section>
+
+      <section class="card">
+        <div class="card-cabecalho">
+          <h2>Perdas por descarte</h2>
+        </div>
+        <div class="resumo-desperdicio" id="resumo-desperdicio"></div>
+        <div id="lista-motivos-descarte"></div>
+      </section>
+    </div>
+
     <section class="card">
-      <h2>Desperdício</h2>
-      <div class="resumo-desperdicio" id="resumo-desperdicio"></div>
-      <div id="lista-descartes" class="vazio">Carregando...</div>
+      <div class="card-cabecalho">
+        <h2>Situação do estoque</h2>
+      </div>
+      <div id="situacao-estoque" class="vazio">Carregando...</div>
     </section>
   </main>
 
