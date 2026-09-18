@@ -2657,3 +2657,274 @@ dialog.modal::backdrop {
     flex-wrap: wrap;
   }
 }
+
+/* Login (V1.0.1) */
+
+body.pagina-login {
+  padding-bottom: 0;
+}
+
+.login-tela {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-painel {
+  display: none;
+}
+
+.login-form-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  padding: 32px 28px;
+  animation: surgir 0.35s ease both;
+}
+
+.login-card-cabecalho {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.login-card-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--verde-clara);
+  color: var(--verde-escura);
+  margin-bottom: 12px;
+}
+
+.login-card-logo svg {
+  width: 24px;
+  height: 24px;
+}
+
+.login-card-cabecalho strong {
+  display: block;
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--verde-escura);
+}
+
+@media (prefers-color-scheme: dark) {
+  .login-card-cabecalho strong {
+    color: var(--verde);
+  }
+}
+
+.login-card-cabecalho p {
+  margin: 4px 0 0;
+  color: var(--cinza);
+  font-size: 0.9rem;
+}
+
+.campo-login {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-senha {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo-senha input {
+  padding-right: 44px;
+}
+
+.campo-senha button {
+  position: absolute;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--cinza);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.campo-senha button:hover {
+  background: var(--superficie-alt);
+  color: var(--texto);
+}
+
+.campo-senha svg {
+  width: 18px;
+  height: 18px;
+}
+
+.login-btn-entrar {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 0.98rem;
+  padding: 13px 16px;
+}
+
+@media (min-width: 860px) {
+  /* A tela de login não usa o grid de sidebar do restante do app (regra
+     "body { display: grid; ... }" acima) — sem isso, .login-tela ficava
+     confinada à coluna de 232px reservada para a sidebar. */
+  body.pagina-login {
+    display: block;
+  }
+
+  .login-tela {
+    flex-direction: row;
+    min-height: 100vh;
+  }
+
+  .login-painel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 50%;
+    max-width: 50%;
+    background: linear-gradient(155deg, var(--verde) 0%, var(--verde-escura) 140%);
+    color: #fff;
+    padding: clamp(32px, 8vh, 64px) clamp(48px, 8vw, 96px);
+  }
+
+  .login-painel-marca {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: clamp(32px, 6vh, 64px);
+  }
+
+  .login-painel-logo {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-painel-logo svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .login-painel-marca strong {
+    font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  .login-painel h1 {
+    font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+    font-size: clamp(2.75rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 22px;
+    max-width: 560px;
+  }
+
+  .login-painel p {
+    font-size: 1.125rem;
+    opacity: 0.88;
+    line-height: 1.5;
+    max-width: 460px;
+    margin: 0;
+  }
+
+  .login-painel-grafico {
+    margin-top: clamp(24px, 6vh, 64px);
+    max-width: 480px;
+  }
+
+  .login-painel-grafico svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .login-form-area {
+    flex: 1 1 50%;
+    max-width: 50%;
+    padding: 24px 48px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 48px;
+  }
+
+  .login-card-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+  }
+
+  .login-card-logo svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .login-card-cabecalho {
+    margin-bottom: 34px;
+  }
+
+  .login-card-cabecalho strong {
+    font-size: 1.7rem;
+  }
+
+  .login-card-cabecalho p {
+    font-size: 1rem;
+    margin-top: 6px;
+  }
+
+  .login-card form {
+    gap: 18px;
+  }
+
+  .campo-login label {
+    font-size: 0.82rem;
+  }
+
+  .campo-login input {
+    height: 50px;
+    padding: 0 16px;
+    font-size: 1rem;
+  }
+
+  .campo-senha input {
+    padding-right: 48px;
+  }
+
+  .campo-senha button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .login-btn-entrar {
+    height: 52px;
+    font-size: 1.05rem;
+    margin-top: 10px;
+  }
+}

@@ -35,3 +35,23 @@ CREATE TABLE IF NOT EXISTS descartes (
   motivo TEXT,
   data TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- V1.0.1: autenticação. Tabelas novas apenas — nenhuma tabela existente
+-- (produtos/vendas/venda_itens/descartes) é alterada.
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  senha_hash TEXT NOT NULL,
+  perfil TEXT NOT NULL DEFAULT 'ADMINISTRADOR',
+  ativo INTEGER NOT NULL DEFAULT 1,
+  criado_em TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Sessões de login (server-side), com expiração em epoch ms para evitar
+-- qualquer ambiguidade de fuso/formatação na comparação de datas.
+CREATE TABLE IF NOT EXISTS sessoes (
+  sid TEXT PRIMARY KEY,
+  dados TEXT NOT NULL,
+  expira_em INTEGER NOT NULL
+);

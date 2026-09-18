@@ -11,6 +11,7 @@
     grafico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12.5" y="8" width="3" height="10"/><rect x="18" y="5" width="3" height="13"/></svg>',
     seta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
     baixar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
+    sair: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
   };
 
   const PAGINAS = [
@@ -70,21 +71,25 @@
     menu.className = 'user-menu';
     menu.innerHTML = `
       <button type="button" class="user-menu-toggle" id="btn-user-menu" aria-haspopup="true" aria-expanded="false">
-        <span class="avatar" aria-hidden="true">A</span>
+        <span class="avatar" id="user-menu-avatar" aria-hidden="true">A</span>
         <span class="user-menu-texto">
-          <strong>Administrador</strong>
-          <small>Mini Mercado Bom Gosto</small>
+          <strong id="user-menu-nome">Administrador</strong>
+          <small id="user-menu-email">&nbsp;</small>
         </span>
         <span class="chevron" aria-hidden="true">${ICONES.seta}</span>
       </button>
       <div class="user-menu-dropdown" id="user-menu-dropdown" hidden>
         <div class="user-menu-info">
-          <strong>Mini Mercado Bom Gosto</strong>
-          <span>Administrador</span>
+          <strong id="user-menu-info-nome">Administrador</strong>
+          <span id="user-menu-info-email"></span>
         </div>
         <button type="button" id="btn-instalar" class="user-menu-item" hidden>
           <span class="icone" aria-hidden="true">${ICONES.baixar}</span>
           <span>Instalar app</span>
+        </button>
+        <button type="button" id="btn-sair" class="user-menu-item">
+          <span class="icone" aria-hidden="true">${ICONES.sair}</span>
+          <span>Sair</span>
         </button>
       </div>
     `;
@@ -112,6 +117,40 @@
     document.addEventListener('keydown', (evento) => {
       if (evento.key === 'Escape') fechar();
     });
+
+    menu.querySelector('#btn-sair').addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } finally {
+        window.location.href = '/login.html';
+      }
+    });
+
+    carregarUsuarioAtual(menu);
+  }
+
+  // Busca o usuário realmente autenticado (nunca hardcoded) para preencher
+  // o menu. Se a sessão já não for mais válida quando essa chamada roda
+  // (ex.: expirou entre o carregamento da página e agora), redireciona
+  // para o login em vez de deixar "Administrador" genérico exposto.
+  async function carregarUsuarioAtual(menu) {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.status === 401) {
+        window.location.href = '/login.html';
+        return;
+      }
+      if (!res.ok) return;
+
+      const usuario = await res.json();
+      menu.querySelector('#user-menu-nome').textContent = usuario.nome;
+      menu.querySelector('#user-menu-email').textContent = usuario.email;
+      menu.querySelector('#user-menu-info-nome').textContent = usuario.nome;
+      menu.querySelector('#user-menu-info-email').textContent = usuario.email;
+      menu.querySelector('#user-menu-avatar').textContent = usuario.nome.trim().charAt(0).toUpperCase() || 'A';
+    } catch (err) {
+      // Sem conexão: mantém o que já está na tela em vez de mostrar erro técnico.
+    }
   }
 
   const atual = paginaAtual();

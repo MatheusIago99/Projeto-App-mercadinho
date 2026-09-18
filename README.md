@@ -17,14 +17,27 @@ Atividades Extensionistas do curso de Análise e Desenvolvimento de Sistemas
 - Backend: Node.js (>= 22.5) e Express
 - Banco de dados: SQLite (via o módulo nativo `node:sqlite`, sem dependências compiladas)
 
+## Autenticação
+
+A partir da V1.0.1, o acesso ao sistema exige login (perfil único:
+Administrador). Configure estas variáveis de ambiente (veja `.env.example`)
+antes do primeiro boot:
+
+- `SESSION_SECRET` — segredo para assinar o cookie de sessão.
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` — usadas **somente** no
+  primeiro boot para criar o administrador inicial (só a senha em hash é
+  gravada no banco). Depois que o administrador existe, essas variáveis
+  não têm mais efeito.
+
 ## Como executar
 
 ```bash
 npm install
+cp .env.example .env   # preencha SESSION_SECRET, ADMIN_EMAIL e ADMIN_PASSWORD
 npm start
 ```
 
-O aplicativo ficará disponível em `http://localhost:3000`.
+O aplicativo ficará disponível em `http://localhost:3000/login.html`.
 
 ## Estrutura do projeto
 
