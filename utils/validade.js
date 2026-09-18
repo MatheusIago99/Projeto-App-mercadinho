@@ -21,6 +21,23 @@ function somarDias(dias) {
   return formatarDataISO(data);
 }
 
+// Desloca uma data (string 'YYYY-MM-DD') em N dias (aceita negativo).
+// Nao envolve "agora"/"hoje", so aritmetica sobre uma data explicita, por
+// isso pode ancorar em UTC sem risco de inconsistencia local/UTC.
+function deslocarData(iso, dias) {
+  const data = new Date(`${iso}T00:00:00Z`);
+  data.setUTCDate(data.getUTCDate() + dias);
+  return data.toISOString().slice(0, 10);
+}
+
+// Diferenca em dias entre duas datas de calendario (string 'YYYY-MM-DD').
+// Mesma razao acima: sem "agora" envolvido, seguro ancorar em UTC.
+function diferencaDias(inicio, fim) {
+  const a = new Date(`${inicio}T00:00:00Z`);
+  const b = new Date(`${fim}T00:00:00Z`);
+  return Math.round((b - a) / 86400000);
+}
+
 function estaVencido(validade) {
   if (!validade) return false;
   return validade.slice(0, 10) < hojeData();
@@ -37,4 +54,11 @@ function formatarDataBR(iso) {
   return `${dia}/${mes}/${ano}`;
 }
 
-module.exports = { hojeData, estaVencido, estaProximoDaValidade, formatarDataBR };
+module.exports = {
+  hojeData,
+  estaVencido,
+  estaProximoDaValidade,
+  formatarDataBR,
+  deslocarData,
+  diferencaDias,
+};

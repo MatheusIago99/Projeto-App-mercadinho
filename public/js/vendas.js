@@ -21,12 +21,7 @@ const vendaDetalheItens = document.getElementById('venda-detalhe-itens');
 const vendaDetalhePagamento = document.getElementById('venda-detalhe-pagamento');
 const vendaDetalheTotal = document.getElementById('venda-detalhe-total');
 
-const PAGAMENTO_ROTULOS = {
-  PIX: 'Pix',
-  DINHEIRO: 'Dinheiro',
-  DEBITO: 'Débito',
-  CREDITO: 'Crédito',
-};
+// PAGAMENTO_ROTULOS vem de api.js (reutilizado tambem em Relatórios).
 
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 860px)');
 

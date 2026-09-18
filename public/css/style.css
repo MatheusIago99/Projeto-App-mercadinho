@@ -2452,3 +2452,150 @@ dialog.modal::backdrop {
     font-size: 0.8rem;
   }
 }
+
+/* Relatórios (Fase 5) */
+
+.relatorio-filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.periodo-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.periodo-btn {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--borda);
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.periodo-btn:hover {
+  border-color: var(--verde);
+}
+
+.periodo-btn.ativo {
+  background: var(--verde-clara);
+  border-color: var(--verde);
+  color: var(--verde-escura);
+}
+
+@media (prefers-color-scheme: dark) {
+  .periodo-btn.ativo {
+    color: var(--verde);
+  }
+}
+
+.periodo-personalizado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  animation: surgir 0.2s ease both;
+}
+
+.periodo-personalizado label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.periodo-personalizado input {
+  width: auto;
+}
+
+.periodo-erro {
+  margin: 0;
+  color: var(--vermelho);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.relatorio-grafico-card #grafico-relatorio {
+  padding-top: 6px;
+}
+
+.relatorios-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.motivos-descarte {
+  margin-top: 4px;
+}
+
+.estoque-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.estoque-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px;
+  border-radius: var(--raio-sm);
+  background: var(--superficie-alt);
+  text-decoration: none;
+  transition: transform 0.12s ease;
+}
+
+.estoque-stat-item:hover {
+  transform: translateY(-1px);
+}
+
+.estoque-stat-item strong {
+  font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.estoque-stat-item span {
+  font-size: 0.78rem;
+  color: var(--cinza);
+  font-weight: 600;
+}
+
+.estoque-stat-amarelo strong {
+  color: var(--amarelo);
+}
+
+.estoque-stat-vermelho strong {
+  color: var(--vermelho);
+}
+
+@media (min-width: 860px) {
+  .relatorios-grid-2col {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .estoque-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .relatorio-filtros {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+}

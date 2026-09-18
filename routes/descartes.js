@@ -3,15 +3,30 @@ const db = require('../db/database');
 
 const router = express.Router();
 
+const REGEX_DATA = /^\d{4}-\d{2}-\d{2}$/;
+
+// inicio/fim (opcionais) filtram por data de calendario ("date(data)"),
+// mesma tecnica ja usada no restante do backend. Sem eles, mantem o
+// comportamento historico: todos os registros.
 router.get('/', (req, res) => {
-  const itens = db
-    .prepare(
-      `SELECT d.*, p.nome AS produto_nome
-       FROM descartes d JOIN produtos p ON p.id = d.produto_id
-       ORDER BY d.data DESC
-       LIMIT 50`
-    )
-    .all();
+  const { inicio, fim } = req.query;
+  const filtrarPorPeriodo = REGEX_DATA.test(inicio) && REGEX_DATA.test(fim);
+  const filtroParams = filtrarPorPeriodo ? [inicio, fim] : [];
+
+  // Quando filtrado por período (uso de Relatórios, que só le "resumo"),
+  // não ha necessidade de buscar a lista de itens individuais.
+  const itens = filtrarPorPeriodo
+    ? []
+    : db
+        .prepare(
+          `SELECT d.*, p.nome AS produto_nome
+           FROM descartes d JOIN produtos p ON p.id = d.produto_id
+           ORDER BY d.data DESC
+           LIMIT 50`
+        )
+        .all();
+
+  const filtroResumoSql = filtrarPorPeriodo ? 'WHERE date(data) BETWEEN ? AND ?' : '';
 
   const resumo = db
     .prepare(
@@ -19,11 +34,22 @@ router.get('/', (req, res) => {
          COUNT(*) AS registros,
          COALESCE(SUM(quantidade), 0) AS quantidade_total,
          COALESCE(SUM(quantidade * preco_unitario), 0) AS valor_total
-       FROM descartes`
+       FROM descartes
+       ${filtroResumoSql}`
     )
-    .get();
+    .get(...filtroParams);
 
-  res.json({ itens, resumo });
+  const porMotivo = db
+    .prepare(
+      `SELECT COALESCE(motivo, 'Outros') AS motivo, COUNT(*) AS registros, COALESCE(SUM(quantidade), 0) AS quantidade
+       FROM descartes
+       ${filtroResumoSql}
+       GROUP BY motivo
+       ORDER BY quantidade DESC`
+    )
+    .all(...filtroParams);
+
+  res.json({ itens, resumo: { ...resumo, porMotivo } });
 });
 
 // Registra o descarte de um produto (venceu, estragou etc.) e dá baixa no estoque.

@@ -48,12 +48,16 @@ const api = {
     const res = await fetch('/api/alertas');
     return res.json();
   },
-  async relatorioVendas(dias) {
-    const res = await fetch(`/api/relatorios/vendas${dias ? `?dias=${dias}` : ''}`);
-    return res.json();
+  async relatorioVendas(inicio, fim) {
+    const params = new URLSearchParams({ inicio, fim });
+    const res = await fetch(`/api/relatorios/vendas?${params}`);
+    const dados = await res.json();
+    if (!res.ok) throw new Error(dados.erro || 'Erro ao carregar relatório');
+    return dados;
   },
-  async listarDescartes() {
-    const res = await fetch('/api/descartes');
+  async listarDescartes(inicio, fim) {
+    const params = inicio && fim ? `?${new URLSearchParams({ inicio, fim })}` : '';
+    const res = await fetch(`/api/descartes${params}`);
     return res.json();
   },
   async registrarDescarte(produto_id, quantidade, motivo) {
@@ -162,6 +166,16 @@ function validadeVenceHoje(validade) {
   if (!validade) return false;
   return validade.slice(0, 10) === hojeDataISO();
 }
+
+// Rótulos de forma de pagamento (Vendas e Relatórios). "NAO_INFORMADO" é o
+// valor que o backend usa para vendas antigas sem forma_pagamento.
+const PAGAMENTO_ROTULOS = {
+  PIX: 'Pix',
+  DINHEIRO: 'Dinheiro',
+  DEBITO: 'Débito',
+  CREDITO: 'Crédito',
+  NAO_INFORMADO: 'Não informado',
+};
 
 const STATUS_ROTULOS = {
   normal: 'Normal',

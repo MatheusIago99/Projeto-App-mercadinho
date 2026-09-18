@@ -142,7 +142,7 @@
   }
 
   function renderizarGrafico(relatorio) {
-    el('stat-faturamento-7d').textContent = formatarMoeda(relatorio.totalFaturamento);
+    el('stat-faturamento-7d').textContent = formatarMoeda(relatorio.resumo.faturamento);
     el('grafico-vendas-7d').innerHTML = graficoFaturamento(relatorio.porDia);
   }
 
@@ -210,10 +210,13 @@
   async function carregarDashboard() {
     renderizarSkeletons();
 
+    const fim = hojeDataISO();
+    const inicio = somarDiasISO(-6);
+
     const [alertasRes, produtosRes, relatorioRes, movimentacoesRes] = await Promise.allSettled([
       api.listarAlertas(),
       api.listarProdutos(),
-      api.relatorioVendas(7),
+      api.relatorioVendas(inicio, fim),
       api.listarMovimentacoes(),
     ]);
 
