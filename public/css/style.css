@@ -2662,12 +2662,15 @@ dialog.modal::backdrop {
 
 body.pagina-login {
   padding-bottom: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .login-tela {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .login-painel {
@@ -2793,7 +2796,6 @@ body.pagina-login {
 
   .login-tela {
     flex-direction: row;
-    min-height: 100vh;
   }
 
   .login-painel {
@@ -2838,10 +2840,10 @@ body.pagina-login {
 
   .login-painel h1 {
     font-family: 'Sora', 'Manrope', system-ui, sans-serif;
-    font-size: clamp(2.75rem, 4vw, 3.25rem);
+    font-size: clamp(2.25rem, 3.4vw, 3.25rem);
     font-weight: 700;
     line-height: 1.2;
-    margin: 0 0 22px;
+    margin: 0 0 clamp(12px, 3vh, 22px);
     max-width: 560px;
   }
 
