@@ -1,11 +1,21 @@
 require('dotenv').config();
 
+// Checado ANTES de qualquer outro require: db/database.js (e tudo que
+// depende dele — rotas, middleware, session store) precisa dessa variável
+// já no carregamento do módulo. Falhar aqui, com uma mensagem clara, evita
+// um stack trace cru caso ela não esteja definida.
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL não definida. Configure a connection string do Postgres (Neon) e reinicie o servidor.');
+  process.exit(1);
+}
+
 const path = require('node:path');
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 
-const SqliteSessionStore = require('./utils/sqliteSessionStore');
+const db = require('./db/database');
+const PgSessionStore = require('./utils/pgSessionStore');
 const { exigirAutenticacao, exigirAutenticacaoPagina } = require('./middleware/autenticacao');
 
 const authRouter = require('./routes/auth');
@@ -39,50 +49,63 @@ if (!process.env.SESSION_SECRET) {
 app.use(cors());
 app.use(express.json());
 
-app.use(
-  session({
-    name: 'smartestoque.sid',
-    store: new SqliteSessionStore(),
-    secret: process.env.SESSION_SECRET || 'dev-only-insecure-secret-troque-em-producao',
-    resave: false,
-    saveUninitialized: false,
-    rolling: true,
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: EM_PRODUCAO,
-      maxAge: 8 * 60 * 60 * 1000, // 8 horas, renovada a cada requisição autenticada
-    },
-  })
-);
+// Postgres é uma rede, não um arquivo local: schema/migrations/bootstrap do
+// administrador agora são assíncronos, então o servidor só começa a aceitar
+// requisições depois que isso terminar (diferente do SQLite antigo, que
+// rodava tudo de forma síncrona no require() do módulo).
+async function iniciar() {
+  await db.iniciar();
 
-// Páginas que exigem sessão ativa. Precisa rodar ANTES do express.static
-// (que serviria o arquivo direto do disco sem checar nada). Arquivos
-// estáticos (css/js/ícones/manifest/sw.js) e login.html continuam de fora
-// dessa lista — a própria tela de login precisa desses assets para
-// carregar, e o service worker precisa poder buscá-los.
-const PAGINAS_PROTEGIDAS = ['/', '/index.html', '/produtos.html', '/vendas.html', '/relatorios.html'];
+  app.use(
+    session({
+      name: 'smartestoque.sid',
+      store: new PgSessionStore(),
+      secret: process.env.SESSION_SECRET || 'dev-only-insecure-secret-troque-em-producao',
+      resave: false,
+      saveUninitialized: false,
+      rolling: true,
+      cookie: {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: EM_PRODUCAO,
+        maxAge: 8 * 60 * 60 * 1000, // 8 horas, renovada a cada requisição autenticada
+      },
+    })
+  );
 
-app.get(PAGINAS_PROTEGIDAS, exigirAutenticacaoPagina);
+  // Páginas que exigem sessão ativa. Precisa rodar ANTES do express.static
+  // (que serviria o arquivo direto do disco sem checar nada). Arquivos
+  // estáticos (css/js/ícones/manifest/sw.js) e login.html continuam de fora
+  // dessa lista — a própria tela de login precisa desses assets para
+  // carregar, e o service worker precisa poder buscá-los.
+  const PAGINAS_PROTEGIDAS = ['/', '/index.html', '/produtos.html', '/vendas.html', '/relatorios.html'];
 
-app.get('/login.html', (req, res, next) => {
-  if (req.session && req.session.usuarioId) {
-    return res.redirect('/index.html');
-  }
-  next();
-});
+  app.get(PAGINAS_PROTEGIDAS, exigirAutenticacaoPagina);
 
-app.use(express.static(path.join(__dirname, 'public')));
+  app.get('/login.html', (req, res, next) => {
+    if (req.session && req.session.usuarioId) {
+      return res.redirect('/index.html');
+    }
+    next();
+  });
 
-app.use('/api/auth', authRouter);
-app.use('/api/produtos', exigirAutenticacao, produtosRouter);
-app.use('/api/vendas', exigirAutenticacao, vendasRouter);
-app.use('/api/compras', exigirAutenticacao, comprasRouter);
-app.use('/api/alertas', exigirAutenticacao, alertasRouter);
-app.use('/api/descartes', exigirAutenticacao, descartesRouter);
-app.use('/api/relatorios', exigirAutenticacao, relatoriosRouter);
-app.use('/api/movimentacoes', exigirAutenticacao, movimentacoesRouter);
+  app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(PORT, () => {
-  console.log(`SmartEstoque rodando em http://localhost:${PORT}`);
+  app.use('/api/auth', authRouter);
+  app.use('/api/produtos', exigirAutenticacao, produtosRouter);
+  app.use('/api/vendas', exigirAutenticacao, vendasRouter);
+  app.use('/api/compras', exigirAutenticacao, comprasRouter);
+  app.use('/api/alertas', exigirAutenticacao, alertasRouter);
+  app.use('/api/descartes', exigirAutenticacao, descartesRouter);
+  app.use('/api/relatorios', exigirAutenticacao, relatoriosRouter);
+  app.use('/api/movimentacoes', exigirAutenticacao, movimentacoesRouter);
+
+  app.listen(PORT, () => {
+    console.log(`SmartEstoque rodando em http://localhost:${PORT}`);
+  });
+}
+
+iniciar().catch((err) => {
+  console.error('Falha ao iniciar o servidor:', err);
+  process.exit(1);
 });

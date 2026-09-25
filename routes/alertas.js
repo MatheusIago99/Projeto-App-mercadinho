@@ -6,8 +6,8 @@ const router = express.Router();
 
 const DIAS_ALERTA_VALIDADE = 7;
 
-router.get('/', (req, res) => {
-  const produtos = db.prepare('SELECT * FROM produtos').all();
+router.get('/', async (req, res) => {
+  const produtos = await db.prepare('SELECT * FROM produtos').all();
 
   // estoqueBaixo preservado como estava (inclui produtos sem estoque, que
   // sao um subconjunto dele) para nao alterar o KPI/Dashboard existente.

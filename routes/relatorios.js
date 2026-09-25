@@ -29,17 +29,17 @@ function validarIntervalo(inicio, fim) {
 // Relatório de vendas do período [inicio, fim] (datas de calendário,
 // inclusivas). Quando os parâmetros não são enviados, assume o dia de hoje
 // (mesma referência de "hoje" usada no restante do sistema).
-router.get('/vendas', (req, res) => {
+router.get('/vendas', async (req, res) => {
   const inicio = req.query.inicio || hojeData();
   const fim = req.query.fim || hojeData();
 
   const erro = validarIntervalo(inicio, fim);
   if (erro) return res.status(400).json({ erro });
 
-  const resumo = db
+  const resumo = await db
     .prepare(
-      `SELECT COUNT(*) AS quantidadeVendas, COALESCE(SUM(total), 0) AS faturamento
-       FROM vendas WHERE date(data) BETWEEN ? AND ?`
+      `SELECT COUNT(*)::int AS "quantidadeVendas", COALESCE(SUM(total), 0) AS faturamento
+       FROM vendas WHERE LEFT(data, 10) BETWEEN ? AND ?`
     )
     .get(inicio, fim);
 
@@ -51,8 +51,8 @@ router.get('/vendas', (req, res) => {
   const duracaoDias = diferencaDias(inicio, fim) + 1;
   const fimAnterior = deslocarData(inicio, -1);
   const inicioAnterior = deslocarData(fimAnterior, -(duracaoDias - 1));
-  const resumoAnterior = db
-    .prepare(`SELECT COALESCE(SUM(total), 0) AS faturamento FROM vendas WHERE date(data) BETWEEN ? AND ?`)
+  const resumoAnterior = await db
+    .prepare(`SELECT COALESCE(SUM(total), 0) AS faturamento FROM vendas WHERE LEFT(data, 10) BETWEEN ? AND ?`)
     .get(inicioAnterior, fimAnterior);
 
   const variacaoPercentual =
@@ -61,10 +61,10 @@ router.get('/vendas', (req, res) => {
   // Gráfico por dia: preenche os dias sem venda com 0 para o gráfico ficar
   // contínuo (mesma técnica já usada antes, agora ancorada no intervalo
   // explícito em vez de "date('now', ...)").
-  const porDiaBanco = db
+  const porDiaBanco = await db
     .prepare(
-      `SELECT date(data) AS dia, SUM(total) AS faturamento
-       FROM vendas WHERE date(data) BETWEEN ? AND ?
+      `SELECT LEFT(data, 10) AS dia, SUM(total) AS faturamento
+       FROM vendas WHERE LEFT(data, 10) BETWEEN ? AND ?
        GROUP BY dia`
     )
     .all(inicio, fim);
@@ -76,14 +76,14 @@ router.get('/vendas', (req, res) => {
     porDia.push({ dia, faturamento: mapaFaturamento.get(dia) || 0 });
   }
 
-  const maisVendidos = db
+  const maisVendidos = await db
     .prepare(
-      `SELECT p.id, p.nome, SUM(vi.quantidade) AS quantidade, SUM(vi.quantidade * vi.preco_unitario) AS receita
+      `SELECT p.id, p.nome, SUM(vi.quantidade)::int AS quantidade, SUM(vi.quantidade * vi.preco_unitario) AS receita
        FROM venda_itens vi
        JOIN produtos p ON p.id = vi.produto_id
        JOIN vendas v ON v.id = vi.venda_id
-       WHERE date(v.data) BETWEEN ? AND ?
-       GROUP BY vi.produto_id
+       WHERE LEFT(v.data, 10) BETWEEN ? AND ?
+       GROUP BY vi.produto_id, p.id, p.nome
        ORDER BY quantidade DESC
        LIMIT ?`
     )
@@ -92,10 +92,10 @@ router.get('/vendas', (req, res) => {
   // Menor saída: todos os produtos, com a quantidade vendida NO PERÍODO
   // (0 quando não vendido), ordenados da menor para a maior. LEFT JOIN
   // evita N+1 (uma query só, sem uma chamada por produto).
-  const menorSaida = db
+  const menorSaida = await db
     .prepare(
       `SELECT p.id, p.nome, p.quantidade AS estoque_atual,
-              COALESCE(SUM(CASE WHEN date(v.data) BETWEEN ? AND ? THEN vi.quantidade ELSE 0 END), 0) AS quantidade_vendida
+              COALESCE(SUM(CASE WHEN LEFT(v.data, 10) BETWEEN ? AND ? THEN vi.quantidade ELSE 0 END), 0)::int AS quantidade_vendida
        FROM produtos p
        LEFT JOIN venda_itens vi ON vi.produto_id = p.id
        LEFT JOIN vendas v ON v.id = vi.venda_id
@@ -105,10 +105,10 @@ router.get('/vendas', (req, res) => {
     )
     .all(inicio, fim, TOP_LIMITE);
 
-  const formasPagamentoBanco = db
+  const formasPagamentoBanco = await db
     .prepare(
-      `SELECT COALESCE(forma_pagamento, 'NAO_INFORMADO') AS forma, COUNT(*) AS quantidade, SUM(total) AS valor
-       FROM vendas WHERE date(data) BETWEEN ? AND ?
+      `SELECT COALESCE(forma_pagamento, 'NAO_INFORMADO') AS forma, COUNT(*)::int AS quantidade, SUM(total) AS valor
+       FROM vendas WHERE LEFT(data, 10) BETWEEN ? AND ?
        GROUP BY forma`
     )
     .all(inicio, fim);
@@ -126,17 +126,17 @@ router.get('/vendas', (req, res) => {
   // não entram no lucro nem na receita "com custo conhecido" usada para a
   // margem — por isso o resultado é sempre rotulado como estimativa, com
   // a cobertura de custo explícita ao lado.
-  const lucroBanco = db
+  const lucroBanco = await db
     .prepare(
       `SELECT
          COALESCE(SUM(CASE WHEN p.preco_custo IS NOT NULL THEN (vi.preco_unitario - p.preco_custo) * vi.quantidade ELSE 0 END), 0) AS lucro,
-         COALESCE(SUM(CASE WHEN p.preco_custo IS NOT NULL THEN vi.quantidade * vi.preco_unitario ELSE 0 END), 0) AS receitaComCusto,
-         COALESCE(SUM(CASE WHEN p.preco_custo IS NOT NULL THEN vi.quantidade ELSE 0 END), 0) AS quantidadeComCusto,
-         COALESCE(SUM(vi.quantidade), 0) AS quantidadeTotal
+         COALESCE(SUM(CASE WHEN p.preco_custo IS NOT NULL THEN vi.quantidade * vi.preco_unitario ELSE 0 END), 0) AS "receitaComCusto",
+         COALESCE(SUM(CASE WHEN p.preco_custo IS NOT NULL THEN vi.quantidade ELSE 0 END), 0)::int AS "quantidadeComCusto",
+         COALESCE(SUM(vi.quantidade), 0)::int AS "quantidadeTotal"
        FROM venda_itens vi
        JOIN vendas v ON v.id = vi.venda_id
        JOIN produtos p ON p.id = vi.produto_id
-       WHERE date(v.data) BETWEEN ? AND ?`
+       WHERE LEFT(v.data, 10) BETWEEN ? AND ?`
     )
     .get(inicio, fim);
 

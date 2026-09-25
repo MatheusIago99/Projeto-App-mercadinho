@@ -39,7 +39,7 @@ function validarInteiroNaoNegativo(valor, rotulo) {
   return { ok: true, valor: numero };
 }
 
-function buscarCodigoBarrasDuplicado(codigo, ignorarId) {
+async function buscarCodigoBarrasDuplicado(codigo, ignorarId) {
   if (!codigo) return null;
   const query = ignorarId
     ? db.prepare('SELECT id FROM produtos WHERE codigo_barras = ? AND id != ?')
@@ -47,18 +47,18 @@ function buscarCodigoBarrasDuplicado(codigo, ignorarId) {
   return ignorarId ? query.get(codigo, ignorarId) : query.get(codigo);
 }
 
-router.get('/', (req, res) => {
-  const produtos = db.prepare('SELECT * FROM produtos ORDER BY nome').all();
+router.get('/', async (req, res) => {
+  const produtos = await db.prepare('SELECT * FROM produtos ORDER BY nome').all();
   res.json(produtos);
 });
 
-router.get('/:id', (req, res) => {
-  const produto = db.prepare('SELECT * FROM produtos WHERE id = ?').get(req.params.id);
+router.get('/:id', async (req, res) => {
+  const produto = await db.prepare('SELECT * FROM produtos WHERE id = ?').get(req.params.id);
   if (!produto) return res.status(404).json({ erro: 'Produto não encontrado' });
   res.json(produto);
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { nome, categoria, validade } = req.body;
   if (!nome || typeof nome !== 'string' || !nome.trim()) {
     return res.status(400).json({ erro: 'Nome é obrigatório.' });
@@ -80,23 +80,23 @@ router.post('/', (req, res) => {
   if (!custo.ok) return res.status(400).json({ erro: custo.erro });
 
   const codigoBarras = normalizarCodigoBarras(req.body.codigo_barras);
-  if (buscarCodigoBarrasDuplicado(codigoBarras, null)) {
+  if (await buscarCodigoBarrasDuplicado(codigoBarras, null)) {
     return res.status(400).json({ erro: 'Já existe um produto cadastrado com este código de barras.' });
   }
 
-  const info = db
+  const info = await db
     .prepare(
       `INSERT INTO produtos (nome, categoria, preco, quantidade, estoque_minimo, validade, preco_custo, codigo_barras)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(nome, categoria || null, preco.valor, quantidade.valor, estoqueMinimo.valor, validade || null, custo.valor, codigoBarras);
 
-  const produto = db.prepare('SELECT * FROM produtos WHERE id = ?').get(info.lastInsertRowid);
+  const produto = await db.prepare('SELECT * FROM produtos WHERE id = ?').get(info.lastInsertRowid);
   res.status(201).json(produto);
 });
 
-router.put('/:id', (req, res) => {
-  const existente = db.prepare('SELECT * FROM produtos WHERE id = ?').get(req.params.id);
+router.put('/:id', async (req, res) => {
+  const existente = await db.prepare('SELECT * FROM produtos WHERE id = ?').get(req.params.id);
   if (!existente) return res.status(404).json({ erro: 'Produto não encontrado' });
 
   const { categoria } = req.body;
@@ -146,12 +146,12 @@ router.put('/:id', (req, res) => {
   let codigoBarras = existente.codigo_barras;
   if (req.body.codigo_barras !== undefined) {
     codigoBarras = normalizarCodigoBarras(req.body.codigo_barras);
-    if (buscarCodigoBarrasDuplicado(codigoBarras, existente.id)) {
+    if (await buscarCodigoBarrasDuplicado(codigoBarras, existente.id)) {
       return res.status(400).json({ erro: 'Já existe um produto cadastrado com este código de barras.' });
     }
   }
 
-  db.prepare(
+  await db.prepare(
     `UPDATE produtos
      SET nome = ?, categoria = ?, preco = ?, quantidade = ?, estoque_minimo = ?, validade = ?, preco_custo = ?, codigo_barras = ?
      WHERE id = ?`
@@ -167,12 +167,12 @@ router.put('/:id', (req, res) => {
     req.params.id
   );
 
-  const produto = db.prepare('SELECT * FROM produtos WHERE id = ?').get(req.params.id);
+  const produto = await db.prepare('SELECT * FROM produtos WHERE id = ?').get(req.params.id);
   res.json(produto);
 });
 
-router.delete('/:id', (req, res) => {
-  const info = db.prepare('DELETE FROM produtos WHERE id = ?').run(req.params.id);
+router.delete('/:id', async (req, res) => {
+  const info = await db.prepare('DELETE FROM produtos WHERE id = ?').run(req.params.id);
   if (info.changes === 0) return res.status(404).json({ erro: 'Produto não encontrado' });
   res.status(204).end();
 });

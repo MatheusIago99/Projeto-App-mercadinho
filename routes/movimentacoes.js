@@ -12,10 +12,10 @@ const LIMITE_EVENTOS = 5;
 // a partir de vendas e descartes reais (com data/hora) e, se ainda houver
 // espaco, complementa com fatos atuais (estoque baixo / validade proxima)
 // sem inventar timestamp para eles.
-router.get('/', (req, res) => {
-  const vendas = db
+router.get('/', async (req, res) => {
+  const vendas = await db
     .prepare(
-      `SELECT v.id, v.data, v.total, COUNT(vi.id) AS itens
+      `SELECT v.id, v.data, v.total, COUNT(vi.id)::int AS itens
        FROM vendas v
        LEFT JOIN venda_itens vi ON vi.venda_id = v.id
        GROUP BY v.id
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
     )
     .all();
 
-  const descartes = db
+  const descartes = await db
     .prepare(
       `SELECT d.id, d.data, d.quantidade, p.nome AS produto_nome
        FROM descartes d
@@ -59,7 +59,7 @@ router.get('/', (req, res) => {
   let resultado = eventos.slice(0, LIMITE_EVENTOS);
 
   if (resultado.length < LIMITE_EVENTOS) {
-    const produtos = db.prepare('SELECT nome, quantidade, estoque_minimo, validade FROM produtos').all();
+    const produtos = await db.prepare('SELECT nome, quantidade, estoque_minimo, validade FROM produtos').all();
 
     // Mesma regra centralizada de utils/validade.js usada em routes/alertas.js,
     // para os dois widgets do dashboard nunca discordarem sobre o mesmo produto.

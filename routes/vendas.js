@@ -11,19 +11,19 @@ const FORMAS_PAGAMENTO = ['PIX', 'DINHEIRO', 'DEBITO', 'CREDITO'];
 // deve expor texto tecnico cru na resposta.
 class ErroValidacao extends Error {}
 
-router.get('/', (req, res) => {
-  const vendas = db.prepare('SELECT * FROM vendas ORDER BY data DESC').all();
+router.get('/', async (req, res) => {
+  const vendas = await db.prepare('SELECT * FROM vendas ORDER BY data DESC').all();
   const itensStmt = db.prepare(
     `SELECT vi.*, p.nome AS produto_nome
      FROM venda_itens vi JOIN produtos p ON p.id = vi.produto_id
      WHERE vi.venda_id = ?`
   );
-  const resultado = vendas.map((venda) => ({ ...venda, itens: itensStmt.all(venda.id) }));
+  const resultado = await Promise.all(vendas.map(async (venda) => ({ ...venda, itens: await itensStmt.all(venda.id) })));
   res.json(resultado);
 });
 
 // Registra uma venda e dá baixa automática no estoque dos produtos vendidos.
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { itens, forma_pagamento } = req.body;
 
   if (!Array.isArray(itens) || itens.length === 0) {
@@ -51,7 +51,7 @@ router.post('/', (req, res) => {
     'INSERT INTO venda_itens (venda_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)'
   );
 
-  db.exec('BEGIN');
+  await db.exec('BEGIN');
   try {
     let total = 0;
     const detalhes = [];
@@ -62,7 +62,7 @@ router.post('/', (req, res) => {
       if (!Number.isInteger(item.quantidade) || item.quantidade <= 0) {
         throw new ErroValidacao('Quantidade inválida para um dos itens da venda.');
       }
-      const produto = buscarProduto.get(item.produto_id);
+      const produto = await buscarProduto.get(item.produto_id);
       if (!produto) throw new ErroValidacao(`Produto ${item.produto_id} não encontrado`);
       if (estaVencido(produto.validade)) {
         throw new ErroValidacao(`Produto vencido: ${produto.nome}. Validade: ${formatarDataBR(produto.validade)}.`);
@@ -78,19 +78,19 @@ router.post('/', (req, res) => {
       throw new ErroValidacao('O valor recebido é menor que o total da venda.');
     }
 
-    const venda = criarVenda.run(total, forma_pagamento, forma_pagamento === 'DINHEIRO' ? valorRecebidoBruto : null);
+    const venda = await criarVenda.run(total, forma_pagamento, forma_pagamento === 'DINHEIRO' ? valorRecebidoBruto : null);
     const vendaId = venda.lastInsertRowid;
 
     for (const { produto, quantidade } of detalhes) {
-      criarItem.run(vendaId, produto.id, quantidade, produto.preco);
-      atualizarEstoque.run(produto.quantidade - quantidade, produto.id);
+      await criarItem.run(vendaId, produto.id, quantidade, produto.preco);
+      await atualizarEstoque.run(produto.quantidade - quantidade, produto.id);
     }
 
-    db.exec('COMMIT');
-    const vendaCriada = db.prepare('SELECT * FROM vendas WHERE id = ?').get(vendaId);
+    await db.exec('COMMIT');
+    const vendaCriada = await db.prepare('SELECT * FROM vendas WHERE id = ?').get(vendaId);
     res.status(201).json(vendaCriada);
   } catch (err) {
-    db.exec('ROLLBACK');
+    await db.exec('ROLLBACK');
     if (err instanceof ErroValidacao) {
       res.status(400).json({ erro: err.message });
     } else {

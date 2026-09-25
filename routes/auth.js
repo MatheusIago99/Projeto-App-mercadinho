@@ -20,7 +20,7 @@ const limitadorLogin = rateLimit({
   message: { erro: 'Muitas tentativas de login. Tente novamente em alguns minutos.' },
 });
 
-router.post('/login', limitadorLogin, (req, res) => {
+router.post('/login', limitadorLogin, async (req, res) => {
   const { email, senha } = req.body;
 
   if (!email || !senha || typeof email !== 'string' || typeof senha !== 'string') {
@@ -28,7 +28,7 @@ router.post('/login', limitadorLogin, (req, res) => {
   }
 
   const emailNormalizado = email.trim().toLowerCase();
-  const usuario = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(emailNormalizado);
+  const usuario = await db.prepare('SELECT * FROM usuarios WHERE email = ?').get(emailNormalizado);
 
   // Sempre roda a verificação de senha (contra o hash real OU o chamariz),
   // nunca decide se autentica com base só em "usuario existe" antes disso.
@@ -58,8 +58,8 @@ router.post('/logout', (req, res) => {
   });
 });
 
-router.get('/me', (req, res) => {
-  const usuario = buscarUsuarioAtivoDaSessao(req);
+router.get('/me', async (req, res) => {
+  const usuario = await buscarUsuarioAtivoDaSessao(req);
   if (!usuario) return res.status(401).json({ erro: 'Não autenticado.' });
 
   res.json({ id: usuario.id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil });

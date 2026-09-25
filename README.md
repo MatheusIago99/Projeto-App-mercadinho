@@ -15,7 +15,7 @@ Atividades Extensionistas do curso de Análise e Desenvolvimento de Sistemas
 
 - Frontend: HTML5, CSS e JavaScript
 - Backend: Node.js (>= 22.5) e Express
-- Banco de dados: SQLite (via o módulo nativo `node:sqlite`, sem dependências compiladas)
+- Banco de dados: PostgreSQL hospedado no [Neon](https://neon.tech) (via `pg`, driver puro em JavaScript, sem dependências compiladas)
 
 ## Autenticação
 
@@ -38,16 +38,18 @@ antes do primeiro boot:
 
 ```bash
 npm install
-cp .env.example .env   # preencha SESSION_SECRET, ADMIN_EMAIL e ADMIN_PASSWORD
+cp .env.example .env   # preencha DATABASE_URL, SESSION_SECRET, ADMIN_EMAIL e ADMIN_PASSWORD
 npm start
 ```
+
+`DATABASE_URL` é a connection string de um banco Postgres (recomendado: [Neon](https://neon.tech), plano gratuito). O schema é criado automaticamente no primeiro boot.
 
 O aplicativo ficará disponível em `http://localhost:3000/login.html`.
 
 ## Estrutura do projeto
 
 ```
-db/          schema e conexão com o banco SQLite
+db/          schema e conexão com o banco PostgreSQL
 routes/      rotas da API (produtos, vendas, compras, alertas)
 public/      frontend (HTML, CSS e JavaScript)
 server.js    ponto de entrada da aplicação Express
@@ -62,11 +64,12 @@ configuração automaticamente:
    com o GitHub).
 2. Clique em **New +** → **Blueprint** e selecione este repositório.
 3. Confirme a criação do serviço `smartestoque` (plano Free).
-4. Aguarde o build/deploy terminar; o Render mostra a URL pública
+4. Configure a variável `DATABASE_URL` no painel do Render (Environment) com
+   a connection string do seu banco Neon.
+5. Aguarde o build/deploy terminar; o Render mostra a URL pública
    (algo como `https://smartestoque.onrender.com`).
 
-**Importante:** no plano gratuito do Render o serviço "dorme" após alguns
-minutos sem uso e o disco não é persistente entre reinicializações — ou
-seja, o banco SQLite pode resetar de tempos em tempos. Para uso contínuo de
-verdade (não apenas para a demonstração do trabalho), o ideal é contratar um
-disco persistente no Render ou trocar o SQLite por um banco hospedado.
+**Sobre persistência:** como os dados ficam no Neon (não no disco do
+Render), o serviço "dormir" por inatividade no plano gratuito do Render não
+afeta os dados — eles continuam lá, só a aplicação demora alguns segundos
+para acordar na próxima requisição.
