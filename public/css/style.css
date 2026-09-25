@@ -988,9 +988,11 @@ form select:focus {
 }
 
 .menu-acoes-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
+  /* position: fixed (não absolute) porque .tabela-container usa
+     overflow: hidden para arredondar os cantos da tabela — um dropdown
+     absoluto ficaria cortado/invisível. Posição (top/left) calculada via
+     JS a partir do botão, ao abrir. */
+  position: fixed;
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: var(--raio-sm);
