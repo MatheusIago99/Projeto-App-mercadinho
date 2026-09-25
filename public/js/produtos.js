@@ -184,6 +184,19 @@
     document.querySelectorAll('.menu-acoes-toggle').forEach((t) => t.setAttribute('aria-expanded', 'false'));
   }
 
+  // O dropdown usa position: fixed (para escapar do overflow: hidden do
+  // .tabela-container, que corta os cantos da tabela) — por isso a
+  // posição precisa ser calculada em JS a partir do botão, em vez de só
+  // CSS relativo ao pai.
+  function posicionarDropdown(toggle, dropdown) {
+    const rectBotao = toggle.getBoundingClientRect();
+    dropdown.style.top = `${rectBotao.bottom + 4}px`;
+    const larguraDropdown = dropdown.offsetWidth || 190;
+    let esquerda = rectBotao.right - larguraDropdown;
+    esquerda = Math.max(8, Math.min(esquerda, window.innerWidth - larguraDropdown - 8));
+    dropdown.style.left = `${esquerda}px`;
+  }
+
   produtosContainer.addEventListener('click', (evento) => {
     const toggle = evento.target.closest('.menu-acoes-toggle');
     if (toggle) {
@@ -194,6 +207,7 @@
       if (!estavaAberto) {
         dropdown.hidden = false;
         toggle.setAttribute('aria-expanded', 'true');
+        posicionarDropdown(toggle, dropdown);
       }
       return;
     }
@@ -216,6 +230,10 @@
   });
 
   document.addEventListener('click', fecharTodosMenus);
+  // scroll não borbulha (bubble) — precisa capture: true para fechar o
+  // dropdown (position: fixed) quando a página rola, senão ele fica
+  // "flutuando" descolado do botão que o abriu.
+  window.addEventListener('scroll', fecharTodosMenus, true);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') fecharTodosMenus();
   });
