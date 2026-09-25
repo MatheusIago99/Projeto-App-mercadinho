@@ -1,6 +1,3 @@
 node_modules/
-db/smartestoque.db
-db/smartestoque.db-shm
-db/smartestoque.db-wal
 .DS_Store
 .env
