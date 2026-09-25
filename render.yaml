@@ -18,3 +18,9 @@ services:
         sync: false
       - key: ADMIN_NAME
         sync: false
+      - key: ADMIN2_EMAIL
+        sync: false
+      - key: ADMIN2_PASSWORD
+        sync: false
+      - key: ADMIN2_NAME
+        sync: false

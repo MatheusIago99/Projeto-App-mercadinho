@@ -39,10 +39,22 @@ function migrar() {
 
 migrar();
 
+// Nunca loga a senha recebida, só o e-mail criado.
+function criarAdministrador(email, senha, nome) {
+  const emailNormalizado = email.trim().toLowerCase();
+  const hash = hashSenha(senha);
+  db.prepare('INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo) VALUES (?, ?, ?, ?, 1)').run(
+    nome,
+    emailNormalizado,
+    hash,
+    'ADMINISTRADOR'
+  );
+  return emailNormalizado;
+}
+
 // Bootstrap do administrador inicial: só roda se NENHUM usuário existir
 // ainda. Depois disso, nunca recria/sobrescreve automaticamente — mesmo
 // que ADMIN_EMAIL/ADMIN_PASSWORD continuem definidos em boots futuros.
-// Nunca loga a senha, só o e-mail criado.
 function bootstrapAdministrador() {
   const { total } = db.prepare('SELECT COUNT(*) AS total FROM usuarios').get();
   if (total > 0) return;
@@ -58,17 +70,30 @@ function bootstrapAdministrador() {
     return;
   }
 
+  console.log(`Administrador inicial criado: ${criarAdministrador(email, senha, nome)}`);
+}
+
+// Bootstrap de um administrador adicional (opcional): existe para ambientes
+// sem acesso a shell/console (ex.: plano gratuito do Render), onde não é
+// possível inserir o usuário diretamente no banco. Só cria se ADMIN2_EMAIL/
+// ADMIN2_PASSWORD estiverem definidas E esse e-mail específico ainda não
+// existir — nunca sobrescreve um usuário já criado, mesmo com as variáveis
+// continuando definidas em boots futuros.
+function bootstrapAdministradorAdicional() {
+  const email = process.env.ADMIN2_EMAIL;
+  const senha = process.env.ADMIN2_PASSWORD;
+  const nome = process.env.ADMIN2_NAME || 'Administrador';
+
+  if (!email || !senha) return;
+
   const emailNormalizado = email.trim().toLowerCase();
-  const hash = hashSenha(senha);
-  db.prepare('INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo) VALUES (?, ?, ?, ?, 1)').run(
-    nome,
-    emailNormalizado,
-    hash,
-    'ADMINISTRADOR'
-  );
-  console.log(`Administrador inicial criado: ${emailNormalizado}`);
+  const existente = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(emailNormalizado);
+  if (existente) return;
+
+  console.log(`Administrador adicional criado: ${criarAdministrador(email, senha, nome)}`);
 }
 
 bootstrapAdministrador();
+bootstrapAdministradorAdicional();
 
 module.exports = db;

@@ -28,6 +28,11 @@ antes do primeiro boot:
   primeiro boot para criar o administrador inicial (só a senha em hash é
   gravada no banco). Depois que o administrador existe, essas variáveis
   não têm mais efeito.
+- `ADMIN2_EMAIL`, `ADMIN2_PASSWORD`, `ADMIN2_NAME` — opcionais, para
+  adicionar um segundo administrador a qualquer momento (não dependem do
+  banco estar vazio). Útil em ambientes sem shell/console, como o plano
+  gratuito do Render: defina as variáveis no painel e rode um novo deploy.
+  Se o e-mail já existir, não faz nada (nunca sobrescreve).
 
 ## Como executar
 
